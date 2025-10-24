@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>F2C Solutions — Profile</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="styles/custom.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="header-bar py-2">
+      <div class="container d-flex align-items-center gap-3">
+        <img src="/assets/f2c_logo.svg" alt="F2C Solutions" width="150" />
+        <div class="me-auto">
+          <div class="text-muted-sm">Inventory • Shop • Tracking</div>
+        </div>
+        <nav class="d-flex gap-2">
+          <a class="nav-link active" href="index.html">Profile</a>
+          <a class="nav-link" href="inventory.html">Inventory</a>
+          <a class="nav-link" href="shop.html">Shop</a>
+          <a class="nav-link" href="tracking.html">Tracking</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container my-4">
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="card card-soft">
+            <div class="card-body">
+              <h2 class="h4 mb-2">Profile</h2>
+              <p class="text-muted-sm mb-3">
+                Manage your farmer profile (login/create).
+              </p>
+
+              <div class="mb-3">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Suscipit, asperiores natus facilis sint commodi cum nesciunt rem
+                tenetur nihil maxime? Delectus minus, iste architecto eveniet
+                quo quasi reiciendis ducimus itaque!
+              </div>
+
+              <hr class="my-3" />
+
+              <form action="/profile" method="post" novalidate class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Name</label>
+                  <input
+                    name="name"
+                    class="form-control"
+                    required
+                    minlength="2"
+                    maxlength="60"
+                  />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Farm name</label>
+                  <input name="farmName" class="form-control" maxlength="80" />
+                </div>
+                <div class="col-12 d-flex gap-2">
+                  <button class="btn btn-success">Save Profile</button>
+                  <button
+                    class="btn btn-outline-secondary"
+                    formaction="/logout"
+                    formmethod="post"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card card-soft">
+            <div class="card-body">
+              <h3 class="h5">Quick actions</h3>
+              <div class="d-flex gap-2 mt-2">
+                <a class="btn btn-outline-success btn-sm" href="inventory.html"
+                  >Go to Inventory</a
+                >
+                <a class="btn btn-success btn-sm" href="shop.html">Open Shop</a>
+              </div>
+              <p class="text-muted-sm mt-3 mb-0">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia
+                non officiis enim quos cum assumenda ea quibusdam veritatis,
+                commodi molestiae. Ex magni ratione culpa quo voluptatem a rem
+                cupiditate rerum.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
