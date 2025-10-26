@@ -11,20 +11,7 @@
     <link href="styles/custom.css" rel="stylesheet" />
   </head>
   <body>
-    <header class="header-bar py-2">
-      <div class="container d-flex align-items-center gap-3">
-        <img src="/assets/f2c_logo.svg" alt="F2C Solutions" width="150" />
-        <div class="me-auto">
-          <div class="text-muted-sm">Inventory • Shop • Tracking</div>
-        </div>
-        <nav class="d-flex gap-2">
-          <a class="nav-link active" href="index.html">Profile</a>
-          <a class="nav-link" href="inventory.html">Inventory</a>
-          <a class="nav-link" href="shop.html">Shop</a>
-          <a class="nav-link" href="tracking.html">Tracking</a>
-        </nav>
-      </div>
-    </header>
+    <div id="navbar"></div>
 
     <main class="container my-4">
       <div class="row g-3">
@@ -105,5 +92,11 @@
         </div>
       </div>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/components.js"></script>
+    <script>
+      loadComponent("navbar", "../components/navbar.html");
+    </script>
   </body>
 </html>
