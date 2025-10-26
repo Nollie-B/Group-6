@@ -20,6 +20,29 @@ It ensures **data accuracy**, **traceability**, and **integrity** through a norm
 
 ---
 
+## Running the Project
+
+### Prerequisites
+
+- A modern web browser (Chrome, Firefox, Safari, or Edge)
+- Local development server (optional, but recommended)
+
+### Project Structure
+
+```
+F2C_Solutions/
+├── frontend/
+│   ├── assets/         # Static assets like images
+│   ├── components/     # Reusable HTML components
+│   ├── html/          # Main HTML pages
+│   ├── js/           # JavaScript files
+│   └── styles/       # CSS stylesheets
+├── database/
+│   ├── diagrams/     # Database diagrams
+│   └── scripts/      # SQL scripts
+└── wireframes/       # UI/UX wireframes
+```
+
 ### Quick Start
 
 1. Clone the repository:
@@ -190,31 +213,6 @@ It consists of **8 main tables**:
 | subtotal                                     | DECIMAL(12,2)              | Total price               |
 | Marketplace_listings_Marketplace_listings_id | FK → Marketplace_listings  | Product listing reference |
 | Orders_Orders_id                             | FK → Orders                | Parent order reference    |
-
----
-
-## Running the Project
-
-### Prerequisites
-
-- A modern web browser (Chrome, Firefox, Safari, or Edge)
-- Local development server (optional, but recommended)
-
-### Project Structure
-
-```
-F2C_Solutions/
-├── frontend/
-│   ├── assets/         # Static assets like images
-│   ├── components/     # Reusable HTML components
-│   ├── html/          # Main HTML pages
-│   ├── js/           # JavaScript files
-│   └── styles/       # CSS stylesheets
-├── database/
-│   ├── diagrams/     # Database diagrams
-│   └── scripts/      # SQL scripts
-└── wireframes/       # UI/UX wireframes
-```
 
 ---
 
