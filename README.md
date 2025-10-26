@@ -148,6 +148,74 @@ It consists of **8 main tables**:
 
 ---
 
+## Running the Project
+
+### Prerequisites
+
+- A modern web browser (Chrome, Firefox, Safari, or Edge)
+- Local development server (optional, but recommended)
+
+### Project Structure
+
+```
+F2C_Solutions/
+├── frontend/
+│   ├── assets/         # Static assets like images
+│   ├── components/     # Reusable HTML components
+│   ├── html/          # Main HTML pages
+│   ├── js/           # JavaScript files
+│   └── styles/       # CSS stylesheets
+├── database/
+│   ├── diagrams/     # Database diagrams
+│   └── scripts/      # SQL scripts
+└── wireframes/       # UI/UX wireframes
+```
+
+### Quick Start
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/Nollie-B/F2C_Solutions.git
+   cd F2C_Solutions
+   ```
+
+2. Open the project:
+
+   - Direct file access
+
+     - Navigate to `frontend/html/index.html`
+     - Open in your web browser (Right click, open with live server)
+
+### Current Features
+
+- Responsive navigation with mobile support
+- Basic page structure for:
+  - Profile management
+  - Inventory tracking
+  - Shop/Marketplace
+  - Order tracking
+- Styled with Bootstrap 5.3.3
+- Custom components system for reusability
+
+### Development Status
+
+The project is currently in early development with:
+
+- Frontend UI structure
+- Database schema design
+- Basic component system
+- Backend implementation (pending)
+- Database integration (pending)
+
+### Known Issues
+
+- The forms are not yet connected to a backend
+- Data is not persisted
+- Sample data needs to be implemented
+
+---
+
 ## Relationships Summary
 
 ```text
