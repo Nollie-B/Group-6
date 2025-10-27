@@ -18,6 +18,13 @@ It ensures **data accuracy**, **traceability**, and **integrity** through a norm
 - Support multiple **users** (farm owners)
 - Maintain **referential integrity** across entities
 
+###Contributed by:
+
+- Mundell Brown (u22637062)
+- Reo Frantzen (u23526140)
+- Marinus Faling (u23555531)
+- André de Klerk (u23590492)
+
 ---
 
 ## Running the Project
