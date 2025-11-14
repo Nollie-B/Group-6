@@ -1,45 +1,392 @@
-<header class="header-bar py-2">
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand" href="index.html">
-        <img
-          src="/frontend/assets/f2c_logo.svg"
-          alt="F2C Solutions"
-          width="150"
-        />
-      </a>
+<!-- Top decorative bar -->
+<div class="top-bar"></div>
 
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <div class="navbar-text d-none d-lg-block me-auto">
-          <div class="text-muted-sm">Inventory • Shop • Tracking</div>
-        </div>
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="inventory.html">Inventory</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="shop.html">Shop</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="tracking.html">Tracking</a>
-          </li>
-        </ul>
+<!-- Main Navigation -->
+<nav class="main-navbar">
+  <div class="navbar-container">
+    
+    <!-- Brand Section -->
+    <div class="navbar-brand">
+      <div class="brand-logo">
+        <img src="../assets/f2c_logo.svg" alt="F2C Logo" width="40" height="40" />
+      </div>
+      <div class="brand-text">
+        <h1>F2C Solutions</h1>
+        <p>Farmer to Customer</p>
       </div>
     </div>
-  </nav>
-</header>
+
+    <!-- Burger Menu Button -->
+    <button class="navbar-toggle" id="navbar-toggle" aria-label="Toggle navigation">
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+    </button>
+
+    <!-- Navigation Menu -->
+    <div class="navbar-menu" id="navbar-menu">
+      <ul class="navbar-nav">
+        <li class="nav-item" data-page="dashboard">
+          <a class="nav-link" href="../html/index.html">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"/>
+              <rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"/>
+              <rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor"/>
+              <rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor"/>
+            </svg>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item" data-page="inventory">
+          <a class="nav-link" href="../html/inventory.html">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6H16V4C16 3.45 15.55 3 15 3H9C8.45 3 8 3.45 8 4V6H4C2.9 6 2 6.9 2 8V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V8C22 6.9 21.1 6 20 6ZM10 4H14V6H10V4ZM16 13H13V16H11V13H8V11H11V8H13V11H16V13Z" fill="currentColor"/>
+            </svg>
+            Inventory
+          </a>
+        </li>
+        <li class="nav-item" data-page="analytics">
+          <a class="nav-link" href="../html/analytics.html">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M3.5 18.49L6 16.49L10.5 12.49L13 15.49L18.5 6.49H22L18.5 18.49H3.5Z" fill="currentColor"/>
+            </svg>
+            Analytics
+          </a>
+        </li>
+        <li class="nav-item" data-page="marketplace">
+          <a class="nav-link" href="../html/shop.html">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M7 18C7 19.1 7.9 20 9 20H19C20.1 20 21 19.1 21 18C21 17.45 20.8 16.95 20.5 16.6L17.6 13.7C17.2 13.3 16.6 13.3 16.2 13.7L15.7 14.2C15.3 14.6 14.7 14.6 14.3 14.2L13.8 13.7C13.4 13.3 12.8 13.3 12.4 13.7L11.9 14.2C11.5 14.6 10.9 14.6 10.5 14.2L10 13.7C9.6 13.3 9 13.3 8.6 13.7L5.7 16.6C5.4 16.95 5.2 17.45 5.2 18H7Z" fill="currentColor"/>
+            </svg>
+            Marketplace
+          </a>
+        </li>
+        <li class="nav-item" data-page="orders">
+          <a class="nav-link" href="../html/tracking.html">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6C5.5 2 5 2.45 5 3V21C5 21.55 5.45 22 6 22H18C18.55 22 19 21.55 19 21V7L14 2ZM18 20H6V4H13V9H18V20Z" fill="currentColor"/>
+            </svg>
+            Orders
+          </a>
+        </li>
+        <li class="nav-item" data-page="profile">
+          <a class="nav-link" href="../html/auth.html">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12C14.8 12 17 9.8 17 7C17 4.2 14.8 2 12 2C9.2 2 7 4.2 7 7C7 9.8 9.2 12 12 12ZM12 14C8.1 14 5 16.9 5 20V21C5 21.55 5.45 22 6 22H18C18.55 22 19 21.55 19 21V20C19 16.9 15.9 14 12 14Z" fill="currentColor"/>
+            </svg>
+            Profile
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<style>
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Top decorative bar */
+.top-bar {
+  height: 4px;
+  background-color: #333;
+  width: 100%;
+}
+
+/* Main Navbar Styles */
+.main-navbar {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  min-height: 80px;
+}
+
+/* Brand Section */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #333;
+}
+
+.brand-logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-text h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brand-text p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Burger Menu Button */
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  gap: 4px;
+}
+
+.hamburger {
+  width: 24px;
+  height: 2px;
+  background-color: #333;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.navbar-toggle.active .hamburger:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.navbar-toggle.active .hamburger:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggle.active .hamburger:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Navigation Menu */
+.navbar-menu {
+  display: flex;
+}
+
+.navbar-nav {
+  display: flex;
+  list-style: none;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Active State */
+.nav-item.active .nav-link {
+  background-color: rgba(90, 138, 89, 0.1);
+  color: #5a8a59;
+}
+
+.nav-item.active .nav-icon {
+  color: #5a8a59;
+}
+
+/* Hover State */
+.nav-link:hover {
+  background-color: rgba(90, 138, 89, 0.05);
+  color: #5a8a59;
+}
+
+.nav-link:hover .nav-icon {
+  color: #5a8a59;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .navbar-toggle {
+    display: flex;
+  }
+  
+  .navbar-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 999;
+  }
+  
+  .navbar-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  
+  .navbar-nav {
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 0;
+  }
+  
+  .nav-link {
+    padding: 16px 20px;
+    border-radius: 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+  
+  .brand-text h1 {
+    font-size: 16px;
+  }
+  
+  .brand-text p {
+    font-size: 11px;
+  }
+  
+  .navbar-container {
+    padding: 0 16px;
+    min-height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-brand {
+    gap: 8px;
+  }
+  
+  .brand-logo img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .brand-text h1 {
+    font-size: 14px;
+  }
+  
+  .brand-text p {
+    font-size: 10px;
+  }
+}
+</style>
+
+<script>
+// Enhanced navbar functionality
+(function() {
+  'use strict';
+  
+  const navbarToggle = document.getElementById('navbar-toggle');
+  const navbarMenu = document.getElementById('navbar-menu');
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  // Initialize active state based on current page
+  function initActiveState() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      const linkPage = href.split('/').pop();
+      
+      if (linkPage === currentPage || (currentPage === '' && linkPage === 'index.html')) {
+        link.parentElement.classList.add('active');
+      }
+    });
+  }
+  
+  // Toggle mobile menu
+  function toggleMobileMenu() {
+    navbarToggle.classList.toggle('active');
+    navbarMenu.classList.toggle('active');
+    
+    // Update aria-expanded for accessibility
+    const isExpanded = navbarToggle.classList.contains('active');
+    navbarToggle.setAttribute('aria-expanded', isExpanded);
+  }
+  
+  // Close mobile menu when clicking nav links
+  function closeMobileMenu() {
+    if (navbarMenu.classList.contains('active')) {
+      navbarToggle.classList.remove('active');
+      navbarMenu.classList.remove('active');
+      navbarToggle.setAttribute('aria-expanded', 'false');
+    }
+  }
+  
+  // Handle navbar toggle click
+  if (navbarToggle) {
+    navbarToggle.addEventListener('click', toggleMobileMenu);
+  }
+  
+  // Close mobile menu when clicking nav links
+  navLinks.forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
+  });
+  
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', function(event) {
+    const isClickInsideNavbar = event.target.closest('.main-navbar');
+    
+    if (!isClickInsideNavbar && navbarMenu.classList.contains('active')) {
+      closeMobileMenu();
+    }
+  });
+  
+  // Close mobile menu on window resize to desktop size
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768 && navbarMenu.classList.contains('active')) {
+      closeMobileMenu();
+    }
+  });
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    initActiveState();
+  });
+  
+})();
+</script>

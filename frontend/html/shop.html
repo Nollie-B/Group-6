@@ -1,102 +1,567 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>F2C Solutions — Shop</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link href="styles/custom.css" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="navbar"></div>
+<head>
+  <meta charset="utf-8" />
+  <title>F2C Solutions — Marketplace</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link href="../styles/custom.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .marketplace-header {
+      background: linear-gradient(135deg, #5a8a59 0%, #6b9c6d 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(90, 138, 89, 0.3);
+    }
+    
+    .marketplace-header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    
+    .marketplace-header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .product-card {
+      background: white;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .product-image {
+      height: 120px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+    
+    .product-info {
+      padding: 1.25rem;
+    }
+    
+    .product-title {
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #5a8a59;
+      margin-bottom: 0.5rem;
+    }
+    
+    .product-meta {
+      font-size: 0.9rem;
+      color: #718096;
+      margin-bottom: 1rem;
+    }
+    
+    .expiry-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .expiry-good { 
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      color: #155724;
+    }
+    
+    .expiry-warning { 
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      color: #856404;
+    }
+    
+    .expiry-danger { 
+      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+      color: #721c24;
+    }
+    
+    .cart-item {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .cart-empty {
+      text-align: center;
+      padding: 2rem;
+      color: #718096;
+    }
+    
+    .cart-total {
+      background: linear-gradient(135deg, #5a8a59 0%, #6b9c6d 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
 
-    <main class="container my-4">
-      <div class="row g-3">
-        <div class="col-lg-8">
-          <div class="card card-soft">
-            <div class="card-body">
-              <h2 class="h4 mb-2">Marketplace</h2>
-              <p class="text-muted-sm mb-3">
-                Browse items listed by farms. Add quantities to cart then
-                checkout.
-              </p>
+  <main class="container my-4">
+    <!-- Header -->
+    <div class="marketplace-header">
+      <h1><i class="fas fa-store me-3"></i>Farmers Marketplace</h1>
+      <p>Browse fresh products directly from local farms</p>
+    </div>
 
-              <form action="/cart/add" method="post">
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Product</th>
-                        <th>Available</th>
-                        <th>Price</th>
-                        <th>Expiry</th>
-                        <th style="width: 10rem">Buy</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
-
-                <div class="d-flex gap-2">
-                  <button class="btn btn-success">Add selected to cart</button>
-                  <a class="btn btn-outline-secondary" href="/market/refresh"
-                    >Refresh</a
-                  >
-                </div>
-              </form>
+    <div class="row g-4">
+      <!-- Products Section -->
+      <div class="col-lg-8">
+        <div class="card card-soft">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h4 mb-0">Available Products</h2>
+              <button class="btn btn-outline-success" onclick="refreshMarketplace()">
+                <i class="fas fa-sync me-2"></i>Refresh
+              </button>
             </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4">
-          <div class="card card-soft">
-            <div class="card-body">
-              <h3 class="h5">Your cart</h3>
-
-              <div class="table-responsive">
-                <table class="table align-middle">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Product</th>
-                      <th>Qty</th>
-                      <th class="text-end">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
+            
+            <div id="productsContainer">
+              <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading marketplace items...</p>
               </div>
-
-              <div class="d-flex justify-content-between">
-                <span class="fw-semibold">Total:</span>
-                <span class="fw-bold">R </span>
-              </div>
-
-              <div class="d-flex gap-2 mt-3">
-                <form action="/checkout" method="post" class="d-inline w-100">
-                  <button class="btn btn-success w-100">Checkout</button>
-                </form>
-                <form action="/cart/clear" method="post" class="d-inline w-100">
-                  <button class="btn btn-outline-secondary w-100">Clear</button>
-                </form>
-              </div>
-
-              <p class="text-muted-sm mt-2 mb-0">
-                Checkout will create orders and update inventory & sales
-                history.
-              </p>
             </div>
           </div>
         </div>
       </div>
-    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/components.js"></script>
-    <script>
-      loadComponent("navbar", "../components/navbar.html");
-    </script>
-  </body>
+      <!-- Cart Section -->
+      <div class="col-lg-4">
+        <div class="card card-soft">
+          <div class="card-body">
+            <h3 class="h5 mb-3">
+              <i class="fas fa-shopping-cart me-2"></i>Your Cart
+            </h3>
+            
+            <div id="cartContainer">
+              <div class="cart-empty">
+                <i class="fas fa-cart-plus fa-2x mb-2"></i>
+                <p>Your cart is empty</p>
+                <small>Add items from the marketplace to get started</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    console.log('Loading navbar component...');
+    
+    // Load navbar component with error handling
+    loadComponent("navbar", "../components/navbar.html").then(() => {
+      console.log('Navbar component loaded successfully');
+    }).catch((error) => {
+      console.error('Failed to load navbar component:', error);
+      
+      // Fallback: Try loading directly with fetch
+      fetch('../components/navbar.html')
+        .then(response => response.text())
+        .then(html => {
+          const navbarElement = document.getElementById('navbar');
+          if (navbarElement) {
+            navbarElement.innerHTML = html;
+            console.log('Navbar loaded via fallback method');
+          }
+        })
+        .catch(fallbackError => {
+          console.error('Fallback navbar loading failed:', fallbackError);
+        });
+    });
+
+    // Initialize cart from localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Load marketplace when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      loadMarketplace();
+      updateCart();
+    });
+
+    function loadMarketplace() {
+      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const container = document.getElementById('productsContainer');
+      
+      if (marketplaceItems.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No products available</h5>
+            <p class="text-muted">Farmers haven't listed any products yet. Check back later!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      marketplaceItems.forEach(item => {
+        const categoryEmoji = {
+          '🌾 Grains & Seeds': '🌾',
+          '🌿 Herbs': '🌿',
+          '🥬 Vegetables': '🥬',
+          '🥛 Dairy': '🥛',
+          '🥩 Meat': '🥩',
+          '🐔 Poultry': '🐔',
+          '📦 Other': '📦'
+        };
+        
+        const daysUntilExpiry = getDaysUntilExpiry(item.expiryDate);
+        const expiryBadge = getExpiryBadge(daysUntilExpiry);
+        
+        html += `
+          <div class="product-card">
+            <div class="product-image">
+              <span>${categoryEmoji[item.category] || '📦'}</span>
+            </div>
+            <div class="product-info">
+              <h5 class="product-title">${item.name}</h5>
+              <div class="product-price">$${item.sellingPrice} per ${item.unit}</div>
+              <div class="product-meta">
+                <i class="fas fa-tag me-1"></i>${item.category}<br>
+                <i class="fas fa-boxes me-1"></i>Available: ${item.quantity} ${item.unit}
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                ${expiryBadge}
+                <div class="d-flex align-items-center">
+                  <input type="number" class="form-control form-control-sm me-2" 
+                         id="qty-${item.id}" value="1" min="1" max="${item.quantity}" 
+                         style="width: 80px;">
+                  <button class="btn btn-success btn-sm" onclick="addToCart(${item.id})">
+                    <i class="fas fa-plus me-1"></i>Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    function addToCart(itemId) {
+      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const item = marketplaceItems.find(i => i.id == itemId);
+      
+      if (!item) {
+        showToast('Product not found', 'error');
+        return;
+      }
+      
+      const quantityInput = document.getElementById(`qty-${itemId}`);
+      const quantity = parseInt(quantityInput.value);
+      
+      if (quantity > item.quantity) {
+        showToast('Not enough stock available', 'error');
+        return;
+      }
+      
+      // Check if item already in cart
+      const existingItem = cart.find(cartItem => cartItem.id == itemId);
+      
+      if (existingItem) {
+        existingItem.quantity += quantity;
+        if (existingItem.quantity > item.quantity) {
+          existingItem.quantity = item.quantity;
+          showToast('Max quantity reached', 'warning');
+        }
+      } else {
+        cart.push({
+          id: item.id,
+          name: item.name,
+          price: item.sellingPrice,
+          unit: item.unit,
+          quantity: quantity,
+          maxQuantity: item.quantity
+        });
+      }
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      showToast(`Added ${quantity} ${item.name} to cart`, 'success');
+      
+      // Reset quantity input
+      quantityInput.value = 1;
+    }
+
+    function updateCart() {
+      const container = document.getElementById('cartContainer');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="cart-empty">
+            <i class="fas fa-cart-plus fa-2x mb-2"></i>
+            <p>Your cart is empty</p>
+            <small>Add items from the marketplace to get started</small>
+          </div>
+        `;
+        updateCartTotal(0);
+        return;
+      }
+      
+      let html = '';
+      let total = 0;
+      
+      cart.forEach((item, index) => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        
+        html += `
+          <div class="cart-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <strong>${item.name}</strong><br>
+                <small class="text-muted">$${item.price} per ${item.unit}</small>
+              </div>
+              <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${index})">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="input-group input-group-sm" style="width: 100px;">
+                <button class="btn btn-outline-secondary" onclick="updateCartQuantity(${index}, -1)">-</button>
+                <input type="number" class="form-control text-center" value="${item.quantity}" 
+                       min="1" max="${item.maxQuantity}" 
+                       onchange="updateCartQuantityDirect(${index}, this.value)">
+                <button class="btn btn-outline-secondary" onclick="updateCartQuantity(${index}, 1)">+</button>
+              </div>
+              <strong>$${subtotal.toFixed(2)}</strong>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `
+        <div class="cart-total">
+          <div class="d-flex justify-content-between">
+            <span>Total:</span>
+            <span class="fs-5 fw-bold">$${total.toFixed(2)}</span>
+          </div>
+        </div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-success" onclick="checkout()">
+            <i class="fas fa-credit-card me-2"></i>Checkout
+          </button>
+          <button class="btn btn-outline-secondary" onclick="clearCart()">
+            <i class="fas fa-trash me-2"></i>Clear Cart
+          </button>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+      updateCartTotal(total);
+    }
+
+    function updateCartQuantity(index, change) {
+      const item = cart[index];
+      const newQuantity = item.quantity + change;
+      
+      if (newQuantity < 1 || newQuantity > item.maxQuantity) {
+        return;
+      }
+      
+      item.quantity = newQuantity;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function updateCartQuantityDirect(index, newQuantity) {
+      newQuantity = parseInt(newQuantity);
+      const item = cart[index];
+      
+      if (newQuantity < 1 || newQuantity > item.maxQuantity) {
+        updateCart(); // Reset to valid value
+        return;
+      }
+      
+      item.quantity = newQuantity;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      showToast('Item removed from cart', 'info');
+    }
+
+    function clearCart() {
+      if (cart.length === 0) return;
+      
+      if (confirm('Are you sure you want to clear your cart?')) {
+        cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCart();
+        showToast('Cart cleared', 'info');
+      }
+    }
+
+    function checkout() {
+      if (cart.length === 0) {
+        showToast('Your cart is empty', 'warning');
+        return;
+      }
+      
+      const customerName = prompt('Please enter your name:');
+      if (!customerName) return;
+      
+      const customerEmail = prompt('Please enter your email:');
+      if (!customerEmail) return;
+      
+      const shippingAddress = prompt('Please enter your shipping address:');
+      if (!shippingAddress) return;
+      
+      // Create order
+      const order = {
+        id: Date.now(),
+        customerName: customerName,
+        customerEmail: customerEmail,
+        products: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        totalAmount: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        orderDate: new Date().toISOString(),
+        status: 'pending',
+        shippingAddress: shippingAddress
+      };
+      
+      // Save order
+      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      orders.push(order);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      // Update inventory
+      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      cart.forEach(cartItem => {
+        const itemIndex = marketplaceItems.findIndex(item => item.id == cartItem.id);
+        if (itemIndex !== -1) {
+          marketplaceItems[itemIndex].quantity -= cartItem.quantity;
+          if (marketplaceItems[itemIndex].quantity <= 0) {
+            marketplaceItems.splice(itemIndex, 1);
+          }
+        }
+      });
+      localStorage.setItem('marketplaceItems', JSON.stringify(marketplaceItems));
+      
+      // Clear cart
+      cart = [];
+      localStorage.setItem('cart', JSON.stringify(cart));
+      
+      // Update displays
+      updateCart();
+      loadMarketplace();
+      
+      showToast('Order placed successfully!', 'success');
+      alert(`Order #${order.id} has been placed successfully!\n\nYou will receive a confirmation email shortly.`);
+    }
+
+    function refreshMarketplace() {
+      loadMarketplace();
+      showToast('Marketplace refreshed', 'info');
+    }
+
+    function updateCartTotal(total) {
+      // This function can be used to update cart total in other parts of the UI if needed
+    }
+
+    function getDaysUntilExpiry(expiryDate) {
+      if (!expiryDate) return Infinity;
+      const today = new Date();
+      const expiry = new Date(expiryDate);
+      const timeDiff = expiry - today;
+      return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    }
+
+    function getExpiryBadge(days) {
+      if (days === Infinity) return '<span class="expiry-badge expiry-good">No expiry</span>';
+      if (days < 0) return `<span class="expiry-badge expiry-danger">Expired ${Math.abs(days)} days ago</span>`;
+      if (days <= 3) return `<span class="expiry-badge expiry-danger">Expires in ${days} days</span>`;
+      if (days <= 7) return `<span class="expiry-badge expiry-warning">Expires in ${days} days</span>`;
+      return `<span class="expiry-badge expiry-good">Expires in ${days} days</span>`;
+    }
+
+    function showToast(message, type = 'success') {
+      const toastContainer = document.getElementById('toastContainer');
+      const toastId = 'toast-' + Date.now();
+      
+      const bgClass = {
+        'success': 'bg-success',
+        'error': 'bg-danger',
+        'info': 'bg-info',
+        'warning': 'bg-warning'
+      }[type] || 'bg-success';
+      
+      const icon = {
+        'success': 'fa-check-circle',
+        'error': 'fa-exclamation-circle',
+        'info': 'fa-info-circle',
+        'warning': 'fa-exclamation-triangle'
+      }[type] || 'fa-check-circle';
+      
+      const toast = document.createElement('div');
+      toast.innerHTML = `
+        <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+          <div class="d-flex">
+            <div class="toast-body">
+              <i class="fas ${icon} me-2"></i>${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast.firstElementChild);
+      const bsToast = new bootstrap.Toast(document.getElementById(toastId));
+      bsToast.show();
+      
+      // Clean up after toast is hidden
+      document.getElementById(toastId).addEventListener('hidden.bs.toast', function() {
+        this.remove();
+      });
+    }
+  </script>
+</body>
 </html>
