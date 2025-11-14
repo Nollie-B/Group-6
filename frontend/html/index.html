@@ -1,429 +1,810 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>Login & Registration Form</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-  
+  <meta charset="utf-8" />
+  <title>F2C Solutions — Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link href="../styles/custom.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/chart.js" rel="stylesheet">
   <style>
-    /* Reset and base styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    .dashboard-metric {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
-
-    body {
-      min-height: 100vh;
-      width: 100%;
-      background: linear-gradient(135deg, #009579 0%, #20c997 100%);
+    
+    .dashboard-metric:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #343a40;
+      margin: 0;
+      line-height: 1;
+    }
+    
+    .metric-label {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-top: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    
+    .metric-trend {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .trend-up {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .trend-down {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .chart-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #e9ecef;
+      height: 400px;
+      position: relative;
+    }
+    
+    .chart-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #343a40;
+      margin-bottom: 16px;
+    }
+    
+    .activity-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f3f4;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+    
+    .activity-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      font-size: 14px;
     }
-
-    .auth-container {
-      max-width: 430px;
-      width: 90%;
-      background: #fff;
+    
+    .activity-icon.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .activity-icon.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .activity-icon.warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .alert-card {
+      background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+      border: 1px solid #fed7d7;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      overflow: hidden;
-      position: relative;
+      padding: 16px;
+      margin-bottom: 12px;
     }
-
-    .auth-container .registration {
-      display: none;
-    }
-
-    #check:checked ~ .registration {
-      display: block;
-    }
-
-    #check:checked ~ .login {
-      display: none;
-    }
-
-    #check {
-      display: none;
-    }
-
-    .auth-form {
-      padding: 2.5rem;
-    }
-
-    .form-header {
-      font-size: 2rem;
+    
+    .alert-title {
       font-weight: 600;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #333;
+      color: #c53030;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
     }
-
-    .form-group {
-      margin-bottom: 1.5rem;
+    
+    .alert-description {
+      font-size: 0.8rem;
+      color: #718096;
+      margin: 0;
     }
-
-    .form-input {
-      width: 100%;
-      height: 55px;
-      padding: 0 15px;
-      font-size: 16px;
-      border: 2px solid #e9ecef;
-      border-radius: 8px;
-      outline: none;
-      transition: all 0.3s ease;
+    
+    /* Spoilage Alerts Styles */
+    .spoilage-alerts-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e9ecef;
+      overflow: hidden;
+    }
+    
+    .spoilage-alerts-header {
+      background: #f8f9fa;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .spoilage-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #343a40;
+      margin-bottom: 4px;
+    }
+    
+    .spoilage-icon {
+      color: #fd7e14;
+      font-size: 1.1rem;
+    }
+    
+    .spoilage-subtitle {
+      color: #6c757d;
+      font-size: 0.875rem;
+      margin: 0;
+    }
+    
+    .spoilage-alerts-list {
+      padding: 0;
+    }
+    
+    .spoilage-alert-item {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f1f3f4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s ease;
+    }
+    
+    .spoilage-alert-item:last-child {
+      border-bottom: none;
+    }
+    
+    .spoilage-alert-item:hover {
       background-color: #f8f9fa;
     }
-
-    .form-input:focus {
-      border-color: #009579;
-      background-color: #fff;
-      box-shadow: 0 0 0 3px rgba(0, 149, 121, 0.1);
+    
+    .spoilage-alert-item.urgent {
+      border-left: 4px solid #dc3545;
     }
-
-    .form-input::placeholder {
-      color: #adb5bd;
+    
+    .spoilage-alert-item.warning {
+      border-left: 4px solid #fd7e14;
     }
-
-    .forgot-password {
-      font-size: 14px;
-      color: #009579;
-      text-decoration: none;
-      text-align: right;
-      display: block;
-      margin-top: -0.5rem;
-      margin-bottom: 1rem;
+    
+    .spoilage-product-info {
+      flex: 1;
     }
-
-    .forgot-password:hover {
-      text-decoration: underline;
-    }
-
-    .btn-auth {
-      width: 100%;
-      height: 55px;
-      color: #fff;
-      background: linear-gradient(135deg, #009579 0%, #20c997 100%);
-      font-size: 16px;
+    
+    .spoilage-product-name {
       font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      color: #343a40;
+      margin: 0 0 4px 0;
+      font-size: 0.95rem;
+    }
+    
+    .spoilage-product-details {
+      color: #6c757d;
+      font-size: 0.875rem;
+      margin: 0;
+    }
+    
+    .spoilage-urgency-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
-    .btn-auth:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 149, 121, 0.4);
-    }
-
-    .auth-switch {
-      font-size: 16px;
-      text-align: center;
-      margin-top: 1.5rem;
-      color: #6c757d;
-    }
-
-    .auth-switch label {
-      color: #009579;
-      cursor: pointer;
-      font-weight: 500;
-      text-decoration: none;
-    }
-
-    .auth-switch label:hover {
-      text-decoration: underline;
-    }
-
-    /* Message styles */
-    .message {
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      display: none;
-      animation: slideIn 0.3s ease;
-    }
-
-    .message.success {
-      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .message.error {
-      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    
+    .spoilage-urgency-badge.urgent {
+      background-color: #f8d7da;
       color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .message.info {
-      background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Loading state */
-    .btn-auth.loading {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .btn-auth.loading::after {
-      content: '';
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid transparent;
-      border-top: 2px solid #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-left: 8px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Responsive design */
-    @media (max-width: 480px) {
-      .auth-container {
-        width: 95%;
-        margin: 20px;
-      }
-      
-      .auth-form {
-        padding: 2rem 1.5rem;
-      }
-      
-      .form-header {
-        font-size: 1.7rem;
-      }
-      
-      .form-input, .btn-auth {
-        height: 50px;
-      }
-    }
-
-    /* Logo section */
-    .auth-logo {
-      text-align: center;
-      padding: 2rem 2.5rem 0;
-    }
-
-    .logo-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #009579 0%, #20c997 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1rem;
     }
     
-    .logo-icon img {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
+    .spoilage-urgency-badge.warning {
+      background-color: #d4edda;
+      color: #155724;
     }
-
-    .logo-text h1 {
-      font-size: 1.5rem;
-      color: #333;
-      margin: 0;
-      font-weight: 600;
-    }
-
-    .logo-text p {
-      font-size: 0.9rem;
+    
+    .spoilage-empty-state {
+      padding: 40px 24px;
+      text-align: center;
       color: #6c757d;
-      margin: 0.25rem 0 0;
+    }
+    
+    .spoilage-empty-state i {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+    
+    .quick-action-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    
+    .quick-action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .quick-action-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      color: #5a8a59;
+    }
+    
+    .quick-action-title {
+      font-weight: 600;
+      color: #343a40;
+      margin-bottom: 4px;
+    }
+    
+    .quick-action-desc {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin: 0;
+    }
+    
+    .weather-widget {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .weather-temp {
+      font-size: 2.2rem;
+      font-weight: 300;
+      margin: 8px 0;
+    }
+    
+    .weather-location {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    
+    .weather-condition {
+      font-size: 1rem;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
-  <div class="auth-container">
-    <input type="checkbox" id="check" />
-
-    <div class="auth-logo">
-      <div class="logo-icon">
-        <img src="../assets/f2c_logo.svg" alt="F2C Logo" width="40" height="40" />
+  <!-- Primary navbar (loaded via component) -->
+  <div id="navbar"></div>
+  
+  <!-- Fallback navbar (shown if component loading fails) -->
+  <div id="navbar-fallback" style="display: none;">
+    <nav class="main-navbar" style="background-color: #f8f9fa; border-bottom: 1px solid #e9ecef; position: sticky; top: 0; z-index: 1000;">
+      <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; min-height: 80px;">
+        <div style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #333;">
+          <div style="width: 40px; height: 40px; background-color: #5a8a59; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">F2C</div>
+          <div>
+            <h1 style="font-size: 18px; font-weight: 700; color: #333; margin: 0;">F2C Solutions</h1>
+            <p style="font-size: 12px; color: #666; margin: 0;">Farmer to Customer</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="../html/index.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px; background-color: #5a8a59; color: white;">Dashboard</a>
+          <a href="../html/inventory.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Inventory</a>
+          <a href="../html/analytics.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Analytics</a>
+          <a href="../html/shop.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Marketplace</a>
+          <a href="../html/tracking.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Orders</a>
+          <a href="../html/auth.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Profile</a>
+        </div>
       </div>
-      <div class="logo-text">
-        <h1>F2C Solutions</h1>
-        <p>Farmer to Customer</p>
-      </div>
-    </div>
-
-    <div class="login auth-form">
-      <header class="form-header">Welcome Back</header>
-      <form class="login-form" id="loginForm">
-        <div class="message login-message" aria-live="polite"></div>
-        
-        <div class="form-group">
-          <input type="text" name="email" class="form-input" placeholder="Enter your email" required autocomplete="email" />
-        </div>
-        
-        <div class="form-group">
-          <input type="password" name="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password" />
-        </div>
-        
-        <a href="#" class="forgot-password">Forgot password?</a>
-        
-        <button type="button" class="btn-auth login-btn" id="loginButton">Login</button>
-        
-        <div class="auth-switch">
-          Don't have an account?
-          <label for="check">Sign Up</label>
-        </div>
-      </form>
-    </div>
-
-    <div class="registration auth-form">
-      <header class="form-header">Create Account</header>
-      <form class="signup-form" id="signupForm">
-        <div class="message signup-message" aria-live="polite"></div>
-        
-        <div class="form-group">
-          <input type="text" name="email" class="form-input" placeholder="Enter your email" required autocomplete="email" />
-        </div>
-        
-        <div class="form-group">
-          <input type="password" name="password" class="form-input" placeholder="Create a password" required autocomplete="new-password" />
-        </div>
-        
-        <div class="form-group">
-          <input type="password" name="confirm" class="form-input" placeholder="Confirm your password" required autocomplete="new-password" />
-        </div>
-        
-        <button type="button" class="btn-auth signup-btn" id="signupButton">Create Account</button>
-        
-        <div class="auth-switch">
-          Already have an account?
-          <label for="check">Login</label>
-        </div>
-      </form>
-    </div>
+    </nav>
   </div>
 
-  <script src="../js/auth.js"></script>
+  <main class="container-fluid py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h1 class="h2 mb-1">Dashboard</h1>
+            <p class="text-muted mb-0">Welcome back! Here's what's happening with your farm today.</p>
+          </div>
+          <div>
+            <button class="btn btn-success">
+              <i class="fas fa-plus me-2"></i>Add Product
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="dashboard-metric">
+          <div class="metric-trend trend-up">
+            <i class="fas fa-arrow-up me-1"></i>12%
+          </div>
+          <div class="metric-value">$24,560</div>
+          <div class="metric-label">Monthly Revenue</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="dashboard-metric">
+          <div class="metric-trend trend-up">
+            <i class="fas fa-arrow-up me-1"></i>8%
+          </div>
+          <div class="metric-value">127</div>
+          <div class="metric-label">Active Orders</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="dashboard-metric">
+          <div class="metric-trend trend-down">
+            <i class="fas fa-arrow-down me-1"></i>3%
+          </div>
+          <div class="metric-value">45</div>
+          <div class="metric-label">Low Stock Items</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="dashboard-metric">
+          <div class="metric-trend trend-up">
+            <i class="fas fa-arrow-up me-1"></i>15%
+          </div>
+          <div class="metric-value">89%</div>
+          <div class="metric-label">Customer Satisfaction</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spoilage Alerts Section -->
+    <div class="row g-4 mb-4">
+      <div class="col-12">
+        <div class="spoilage-alerts-card">
+          <div class="spoilage-alerts-header">
+            <div class="spoilage-title">
+              <i class="fas fa-exclamation-triangle spoilage-icon"></i>
+              <span>Spoilage Alerts</span>
+            </div>
+            <p class="spoilage-subtitle">Products approaching expiration dates</p>
+          </div>
+          
+          <div class="spoilage-alerts-list" id="spoilageAlertsList">
+            <!-- Spoilage alerts will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Revenue Chart -->
+      <div class="col-lg-8">
+        <div class="chart-container">
+          <div class="chart-title">Revenue Overview</div>
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Weather Widget -->
+      <div class="col-lg-4">
+        <div class="weather-widget mb-4">
+          <div class="weather-location">
+            <i class="fas fa-map-marker-alt me-2"></i>Farm Location
+          </div>
+          <div class="weather-temp">72°F</div>
+          <div class="weather-condition">
+            <i class="fas fa-sun me-2"></i>Partly Cloudy
+          </div>
+        </div>
+        
+        <!-- Alerts -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+              Alerts
+            </h5>
+            
+            <div class="alert-card">
+              <div class="alert-title">Low Stock Alert</div>
+              <p class="alert-description">Tomatoes running low (5 units remaining)</p>
+            </div>
+            
+            <div class="alert-card">
+              <div class="alert-title">New Order</div>
+              <p class="alert-description">Order #1247 - Organic Lettuce Bundle</p>
+            </div>
+            
+            <div class="alert-card">
+              <div class="alert-title">Weather Warning</div>
+              <p class="alert-description">Frost expected tonight - protect sensitive crops</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+      <!-- Sales by Product -->
+      <div class="col-lg-6">
+        <div class="chart-container">
+          <div class="chart-title">Sales by Product Category</div>
+          <canvas id="productChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Recent Activity -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-clock text-info me-2"></i>
+              Recent Activity
+            </h5>
+            
+            <div class="activity-item">
+              <div class="activity-icon success">
+                <i class="fas fa-check"></i>
+              </div>
+              <div>
+                <div class="fw-bold">Order Delivered</div>
+                <small class="text-muted">Organic vegetables to Green Valley Market</small>
+              </div>
+            </div>
+            
+            <div class="activity-item">
+              <div class="activity-icon info">
+                <i class="fas fa-plus"></i>
+              </div>
+              <div>
+                <div class="fw-bold">New Product Added</div>
+                <small class="text-muted">Fresh Basil - 50 units added to inventory</small>
+              </div>
+            </div>
+            
+            <div class="activity-item">
+              <div class="activity-icon success">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+              <div>
+                <div class="fw-bold">Payment Received</div>
+                <small class="text-muted">$189.50 from Customer #34</small>
+              </div>
+            </div>
+            
+            <div class="activity-item">
+              <div class="activity-icon warning">
+                <i class="fas fa-exclamation"></i>
+              </div>
+              <div>
+                <div class="fw-bold">Low Stock Warning</div>
+                <small class="text-muted">Carrots at 8 units - restock needed</small>
+              </div>
+            </div>
+            
+            <div class="activity-item">
+              <div class="activity-icon info">
+                <i class="fas fa-star"></i>
+              </div>
+              <div>
+                <div class="fw-bold">5-Star Review</div>
+                <small class="text-muted">"Amazing fresh produce quality!"</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mt-4">
+      <div class="col-12">
+        <h5 class="mb-3">Quick Actions</h5>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <a href="inventory.html" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class="fas fa-boxes"></i>
+          </div>
+          <div class="quick-action-title">Manage Inventory</div>
+          <p class="quick-action-desc">Add, edit, or remove products</p>
+        </a>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <a href="shop.html" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="quick-action-title">Marketplace</div>
+          <p class="quick-action-desc">View your online store</p>
+        </a>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <a href="tracking.html" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="quick-action-title">Analytics</div>
+          <p class="quick-action-desc">View detailed reports</p>
+        </a>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <a href="tracking.html" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class="fas fa-clipboard-list"></i>
+          </div>
+          <div class="quick-action-title">Orders</div>
+          <p class="quick-action-desc">Manage customer orders</p>
+        </a>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <a href="#" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class="fas fa-camera"></i>
+          </div>
+          <div class="quick-action-title">Upload Photos</div>
+          <p class="quick-action-desc">Add product images</p>
+        </a>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <a href="auth.html" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class="fas fa-user-cog"></i>
+          </div>
+          <div class="quick-action-title">Profile</div>
+          <p class="quick-action-desc">Manage your account</p>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/components.js"></script>
   <script>
-    // Enhanced debugging and error handling
-    console.log('Auth page loaded successfully');
+    console.log('Loading navbar component...');
     
-    // Test if elements are found and event listeners work
-    function debugAuthPage() {
-      console.log('🔍 Debug: Checking auth page elements...');
+    // Load navbar component with error handling
+    loadComponent("navbar", "../components/navbar.html").then(() => {
+      console.log('Navbar component loaded successfully');
+      // Hide fallback navbar if main navbar loaded successfully
+      const fallback = document.getElementById('navbar-fallback');
+      if (fallback) {
+        fallback.style.display = 'none';
+      }
+    }).catch((error) => {
+      console.error('Failed to load navbar component:', error);
       
-      const elements = {
-        container: document.querySelector('.auth-container'),
-        loginForm: document.querySelector('.login-form'),
-        signupForm: document.querySelector('.signup-form'),
-        loginBtn: document.querySelector('.login-btn'),
-        signupBtn: document.querySelector('.signup-btn'),
-        loginMsg: document.querySelector('.login-message'),
-        signupMsg: document.querySelector('.signup-message'),
-        checkToggle: document.getElementById('check')
-      };
-      
-      Object.entries(elements).forEach(([name, element]) => {
-        if (element) {
-          console.log(`✅ ${name}: Found`);
-        } else {
-          console.error(`❌ ${name}: Not found`);
-        }
-      });
-      
-      // Test CSS
-      const container = elements.container;
-      if (container) {
-        const containerStyle = window.getComputedStyle(container);
-        console.log('🎨 CSS Status:', {
-          background: containerStyle.backgroundColor,
-          maxWidth: containerStyle.maxWidth,
-          borderRadius: containerStyle.borderRadius
-        });
+      // Show fallback navbar
+      const fallback = document.getElementById('navbar-fallback');
+      if (fallback) {
+        fallback.style.display = 'block';
+        console.log('Fallback navbar shown');
       }
       
-      // Test form switching
-      if (elements.checkToggle) {
-        elements.checkToggle.addEventListener('change', function() {
-          const loginVisible = document.querySelector('.login-form').style.display !== 'none';
-          const signupVisible = document.querySelector('.registration').style.display !== 'none';
-          console.log('🔄 Form toggle test:', {
-            loginVisible,
-            signupVisible,
-            checked: this.checked
-          });
+      // Try fallback method
+      fetch('../components/navbar.html')
+        .then(response => response.text())
+        .then(html => {
+          const navbarElement = document.getElementById('navbar');
+          if (navbarElement) {
+            navbarElement.innerHTML = html;
+            console.log('Navbar loaded via fallback method');
+            // Hide fallback navbar if successful
+            const fallback = document.getElementById('navbar-fallback');
+            if (fallback) {
+              fallback.style.display = 'none';
+            }
+          }
+        })
+        .catch(fallbackError => {
+          console.error('Fallback navbar loading failed:', fallbackError);
         });
-        console.log('✅ Form toggle listener added');
-      }
-    }
-    
-    // Run debug after DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', debugAuthPage);
-    } else {
-      debugAuthPage();
-    }
-    
-    // Test JavaScript loading
-    console.log('📜 Script status:', {
-      authJS: typeof window.authDebug !== 'undefined' ? 'Loaded' : 'Not loaded',
-      readyState: document.readyState
-    });
-    
-    // Additional initialization
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 DOM ready - auth system should be initialized');
-      
-      // Test button functionality after a short delay
-      setTimeout(() => {
-        const loginBtn = document.querySelector('.login-btn');
-        const signupBtn = document.querySelector('.signup-btn');
-        
-        if (loginBtn) {
-          loginBtn.addEventListener('click', () => console.log('🖱️ Login button clicked directly'));
-        }
-        
-        if (signupBtn) {
-          signupBtn.addEventListener('click', () => console.log('🖱️ Signup button clicked directly'));
-        }
-        
-        console.log('✅ Direct button listeners added for testing');
-      }, 500);
     });
 
-    // Test CSS loading with external stylesheet (fallback)
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '../styles/auth.css';
-    link.onload = () => console.log('✅ External auth.css loaded successfully');
-    link.onerror = () => console.warn('⚠️ External auth.css failed to load (using inline styles instead)');
-    document.head.appendChild(link);
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+          label: 'Revenue',
+          data: [12000, 15000, 18000, 22000, 25000, 28000, 32000, 35000, 38000, 42000, 45000, 48000],
+          borderColor: '#5a8a59',
+          backgroundColor: 'rgba(90, 138, 89, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '$' + value.toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Product Sales Chart
+    const productCtx = document.getElementById('productChart').getContext('2d');
+    new Chart(productCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Vegetables', 'Fruits', 'Herbs', 'Dairy', 'Other'],
+        datasets: [{
+          data: [35, 25, 20, 15, 5],
+          backgroundColor: [
+            '#5a8a59',
+            '#8bb17c',
+            '#a8d4a3',
+            '#c8e6c9',
+            '#e8f5e9'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    // Spoilage Alerts System
+    function loadSpoilageAlerts() {
+      const alertsList = document.getElementById('spoilageAlertsList');
+      if (!alertsList) return;
+
+      // Sample spoilage data - in a real app, this would come from your inventory database
+      const spoilageData = [
+        {
+          name: "Organic Tomatoes",
+          quantity: "25kg",
+          expiryDays: 2,
+          urgency: "urgent",
+          category: "vegetables"
+        },
+        {
+          name: "Fresh Lettuce",
+          quantity: "15kg",
+          expiryDays: 3,
+          urgency: "warning",
+          category: "vegetables"
+        },
+        {
+          name: "Strawberries",
+          quantity: "10kg",
+          expiryDays: 1,
+          urgency: "urgent",
+          category: "fruits"
+        },
+        {
+          name: "Avocados",
+          quantity: "8kg",
+          expiryDays: 2,
+          urgency: "urgent",
+          category: "fruits"
+        },
+        {
+          name: "Spinach",
+          quantity: "12kg",
+          expiryDays: 4,
+          urgency: "warning",
+          category: "vegetables"
+        }
+      ];
+
+      // Filter alerts to only show items expiring within 7 days
+      const activeAlerts = spoilageData.filter(item => item.expiryDays <= 7);
+
+      if (activeAlerts.length === 0) {
+        alertsList.innerHTML = `
+          <div class="spoilage-empty-state">
+            <i class="fas fa-check-circle"></i>
+            <p>All products are fresh! No spoilage alerts at this time.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Sort by urgency (urgent first) then by days until expiry
+      activeAlerts.sort((a, b) => {
+        if (a.urgency === 'urgent' && b.urgency === 'warning') return -1;
+        if (a.urgency === 'warning' && b.urgency === 'urgent') return 1;
+        return a.expiryDays - b.expiryDays;
+      });
+
+      // Generate HTML for each alert
+      const alertsHTML = activeAlerts.map(item => {
+        const urgencyClass = item.urgency;
+        const urgencyText = item.urgency === 'urgent' ? 'Urgent' : 'Warning';
+        const urgencyBadgeClass = item.urgency;
+        const daysText = item.expiryDays === 1 ? 'day' : 'days';
+        
+        return `
+          <div class="spoilage-alert-item ${urgencyClass}">
+            <div class="spoilage-product-info">
+              <div class="spoilage-product-name">${item.name}</div>
+              <div class="spoilage-product-details">
+                ${item.quantity} • Expires in ${item.expiryDays} ${daysText}
+              </div>
+            </div>
+            <div class="spoilage-urgency-badge ${urgencyBadgeClass}">
+              ${urgencyText}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      alertsList.innerHTML = alertsHTML;
+    }
+
+    // Initialize spoilage alerts when page loads
+    document.addEventListener('DOMContentLoaded', loadSpoilageAlerts);
+
+    // Refresh alerts every 5 minutes
+    setInterval(loadSpoilageAlerts, 5 * 60 * 1000);
+
   </script>
 </body>
 </html>
