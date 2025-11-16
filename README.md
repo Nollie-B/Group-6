@@ -6,7 +6,7 @@
 
 ## Project Purpose
 
-The **Farm Shop Database System** provides a centralized solution for farmers to manage their inventory, marketplace listings, sales history, and customer orders.  
+The **Farm Shop Database System** provides a centralized solution for farmers to manage their inventory, marketplace listings, sales history and customer orders.  
 It ensures **data accuracy**, **traceability**, and **integrity** through a normalized relational schema with foreign keys and clear one-to-many relationships.
 
 ### Key Features
