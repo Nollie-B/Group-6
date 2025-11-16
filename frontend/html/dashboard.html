@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>F2C Solutions — Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -217,7 +216,7 @@
           </div>
         </div>
         <div style="display: flex; gap: 8px;">
-          <a href="../html/index.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px; background-color: #5a8a59; color: white;">Dashboard</a>
+          <a href="../html/dashboard.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px; background-color: #5a8a59; color: white;">Dashboard</a>
           <a href="../html/inventory.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Inventory</a>
           <a href="../html/analytics.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Analytics</a>
           <a href="../html/shop.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Marketplace</a>
@@ -237,51 +236,40 @@
             <h1 class="h2 mb-1">Dashboard</h1>
             <p class="text-muted mb-0">Welcome back! Here's what's happening with your farm today.</p>
           </div>
-          <div>
-            <button class="btn btn-success">
-              <i class="fas fa-plus me-2"></i>Add Product
-            </button>
-          </div>
         </div>
       </div>
     </div>
 
-    <!-- Key Metrics -->
+    <!-- Key Metrics (dynamic, per-user) -->
     <div class="row g-4 mb-4">
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-4 col-md-6">
         <div class="dashboard-metric">
           <div class="metric-trend trend-up">
-            <i class="fas fa-arrow-up me-1"></i>12%
+            <i class="fas fa-arrow-up me-1"></i>
+            <span id="monthlyTrend">0%</span>
           </div>
-          <div class="metric-value">$24,560</div>
+          <div class="metric-value" id="monthlyRevenue">$0</div>
           <div class="metric-label">Monthly Revenue</div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-4 col-md-6">
         <div class="dashboard-metric">
           <div class="metric-trend trend-up">
-            <i class="fas fa-arrow-up me-1"></i>8%
+            <i class="fas fa-arrow-up me-1"></i>
+            <span id="activeOrdersTrend">0%</span>
           </div>
-          <div class="metric-value">127</div>
+          <div class="metric-value" id="activeOrders">0</div>
           <div class="metric-label">Active Orders</div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-4 col-md-6">
         <div class="dashboard-metric">
           <div class="metric-trend trend-down">
-            <i class="fas fa-arrow-down me-1"></i>3%
+            <i class="fas fa-arrow-down me-1"></i>
+            <span id="lowStockTrend">0%</span>
           </div>
-          <div class="metric-value">45</div>
+          <div class="metric-value" id="lowStockItems">0</div>
           <div class="metric-label">Low Stock Items</div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6">
-        <div class="dashboard-metric">
-          <div class="metric-trend trend-up">
-            <i class="fas fa-arrow-up me-1"></i>15%
-          </div>
-          <div class="metric-value">89%</div>
-          <div class="metric-label">Customer Satisfaction</div>
         </div>
       </div>
     </div>
@@ -315,19 +303,8 @@
               Alerts
             </h5>
             
-            <div class="alert-card">
-              <div class="alert-title">Low Stock Alert</div>
-              <p class="alert-description">Tomatoes running low (5 units remaining)</p>
-            </div>
-            
-            <div class="alert-card">
-              <div class="alert-title">New Order</div>
-              <p class="alert-description">Order #1247 - Organic Lettuce Bundle</p>
-            </div>
-            
-            <div class="alert-card">
-              <div class="alert-title">Weather Warning</div>
-              <p class="alert-description">Frost expected tonight - protect sensitive crops</p>
+            <div id="alertsContainer">
+              <!-- Alerts will be populated dynamically by JavaScript -->
             </div>
           </div>
         </div>
@@ -406,6 +383,29 @@
       </div>
     </div>
 
+    <!-- Demand Forecast Prototype -->
+    <div class="row g-4 mt-4">
+      <div class="col-12">
+        <div class="chart-container">
+          <div class="chart-title">Demand Forecast (Prototype)</div>
+          <div class="row">
+            <div class="col-lg-8">
+              <canvas id="demandChart" style="height:220px;"></canvas>
+            </div>
+            <div class="col-lg-4">
+              <div id="demandSummary">
+                <h6>Next 7 days forecast</h6>
+                <div class="metric-value" id="forecastTotal">—</div>
+                <p class="text-muted" id="forecastConfidence">Confidence: —</p>
+                <p class="text-muted"><small>Updated: <span id="demandLastUpdated">-</span></small></p>
+                <button class="btn btn-sm btn-outline-secondary" id="refreshDemandBtn">Refresh Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="row g-4 mt-4">
       <div class="col-12">
@@ -471,6 +471,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../js/components.js"></script>
+  <script src="../js/db.js"></script>
   <script>
     console.log('Loading navbar component...');
     
@@ -512,42 +513,395 @@
         });
     });
 
-    // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(revenueCtx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        datasets: [{
-          label: 'Revenue',
-          data: [12000, 15000, 18000, 22000, 25000, 28000, 32000, 35000, 38000, 42000, 45000, 48000],
-          borderColor: '#5a8a59',
-          backgroundColor: 'rgba(90, 138, 89, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return '$' + value.toLocaleString();
-              }
+    // Dashboard data helpers
+    function getCurrentUser() {
+      if (window.F2CDB && typeof F2CDB.getCurrentUser === 'function') return F2CDB.getCurrentUser();
+      return localStorage.getItem('pp_loggedInUser') || null;
+    }
+
+    function readOrders() {
+      try { return JSON.parse(localStorage.getItem('orders')) || []; } catch (e) { return []; }
+    }
+
+    function formatCurrency(n) {
+      return '$' + (n || 0).toFixed(2);
+    }
+
+    // Compute per-user metrics and update UI
+    function updateDashboardMetrics() {
+      const user = getCurrentUser();
+      const inventory = window.F2CDB ? F2CDB.readInventory() : (JSON.parse(localStorage.getItem('inventory')) || []);
+      const marketplace = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
+      const orders = readOrders();
+
+      // Revenue per month for items sold by this user
+      const monthlyData = Array(12).fill(0);
+      let totalRevenue = 0;
+      let userOrderCount = 0;
+
+      if (user && orders.length) {
+        orders.forEach(order => {
+          const orderMonth = new Date(order.orderDate || order.date || Date.now()).getMonth();
+          // check if order contains products from this user's marketplace listings
+          let orderHasUserItem = false;
+          (order.products || order.items || []).forEach(p => {
+            // Try to match marketplace item by id or name
+            let matched = null;
+            if (p.id) matched = marketplace.find(m => String(m.id) === String(p.id));
+            if (!matched) matched = marketplace.find(m => m.name === p.name && m.owner === user);
+            if (matched && matched.owner === user) {
+              const lineTotal = (p.price || p.sellingPrice || 0) * (p.quantity || 0);
+              monthlyData[orderMonth] += lineTotal;
+              totalRevenue += lineTotal;
+              orderHasUserItem = true;
             }
-          }
-        }
+          });
+          if (orderHasUserItem) userOrderCount++;
+        });
       }
+
+      // Active orders: number of orders including this user's items (pending/confirmed)
+      const activeOrders = userOrderCount;
+
+      // Low stock: inventory items for this user below threshold
+      const lowStockThreshold = 10;
+      const lowStockCount = (inventory.filter(i => (i.quantity || 0) <= lowStockThreshold)).length;
+
+      // Update DOM
+      const monthlyEl = document.getElementById('monthlyRevenue');
+      const activeEl = document.getElementById('activeOrders');
+      const lowStockEl = document.getElementById('lowStockItems');
+      if (monthlyEl) monthlyEl.textContent = formatCurrency(totalRevenue);
+      if (activeEl) activeEl.textContent = activeOrders;
+      if (lowStockEl) lowStockEl.textContent = lowStockCount;
+
+      // Update revenue chart using computed monthlyData
+      const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+      if (window._f2cRevenueChart) {
+        window._f2cRevenueChart.data.datasets[0].data = monthlyData;
+        window._f2cRevenueChart.update();
+      } else {
+        window._f2cRevenueChart = new Chart(revenueCtx, {
+          type: 'line',
+          data: {
+            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            datasets: [{
+              label: 'Revenue',
+              data: monthlyData,
+              borderColor: '#5a8a59',
+              backgroundColor: 'rgba(90, 138, 89, 0.1)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } }
+          }
+        });
+      }
+
+      // Spoilage alerts: replace existing logic to use per-user inventory
+      try { if (typeof loadSpoilageAlerts === 'function') loadSpoilageAlerts(); } catch(e) {}
+    }
+
+    // Run metrics update on load and when storage changes
+    document.addEventListener('DOMContentLoaded', function() {
+      updateDashboardMetrics();
     });
+
+    window.addEventListener('storage', function() {
+      // update metrics if another tab changed data
+      updateDashboardMetrics();
+    });
+
+    // Also refresh metrics when the page/tab becomes visible or receives focus
+    // This covers cases where the user navigates away and returns without a full reload.
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') updateDashboardMetrics();
+    });
+
+    window.addEventListener('focus', function() {
+      updateDashboardMetrics();
+    });
+
+    // pageshow handles bfcache/Back-Forward Cache restores in some browsers
+    window.addEventListener('pageshow', function() {
+      updateDashboardMetrics();
+    });
+
+    // Listen for custom events from in-page loaders or nav components
+    document.addEventListener('f2c:show-dashboard', function() {
+      updateDashboardMetrics();
+    });
+
+    document.addEventListener('f2c:component-loaded', function(e) {
+      try {
+        const path = (e && e.detail && e.detail.componentPath) || '';
+        if (path && (path.indexOf('dashboard') !== -1 || path.indexOf('index') !== -1)) {
+          updateDashboardMetrics();
+        }
+      } catch (err) {}
+    });
+
+    // Load dynamic alerts (low-stock + recent orders for current user)
+    function loadSpoilageAlerts() {
+      const alertsList = document.getElementById('alertsContainer');
+      if (!alertsList) return;
+
+      const user = getCurrentUser();
+      const inventory = window.F2CDB ? F2CDB.readInventory() : (JSON.parse(localStorage.getItem('inventory')) || []);
+      const marketplace = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
+      const orders = readOrders();
+
+      const lowStockThreshold = 10;
+      const lowStock = (inventory || []).filter(i => (i.quantity || 0) <= lowStockThreshold);
+
+      // Expiry-based alerts: inventory items and marketplace listings expiring soon
+      const expiryWindowDays = 7; // show warnings for items expiring within 7 days
+      const urgentDays = 3; // urgent if <= 3 days
+      function daysUntil(dateStr) {
+        if (!dateStr) return Infinity;
+        const d = new Date(dateStr);
+        if (isNaN(d)) return Infinity;
+        const diff = (d - new Date()) / (1000 * 60 * 60 * 24);
+        return Math.ceil(diff);
+      }
+
+      const expiringInventory = (inventory || []).filter(i => {
+        const days = daysUntil(i.expiry || i.expiryDate || i.expiryDateString);
+        return days <= expiryWindowDays;
+      }).map(i => ({ item: i, days: daysUntil(i.expiry || i.expiryDate || i.expiryDateString) }));
+
+      // Also check marketplace listings owned by this user for expiryDate
+      const expiringListings = (marketplace || []).filter(m => m.owner === user).filter(m => {
+        const days = daysUntil(m.expiryDate || m.expiry);
+        return days <= expiryWindowDays;
+      }).map(m => ({ item: m, days: daysUntil(m.expiryDate || m.expiry) }));
+
+      // Recent orders that include this user's marketplace items
+      const recentOrders = (orders || []).slice().reverse().filter(order => {
+        const lines = (order.products || order.items || []);
+        return lines.some(p => {
+          let matched = null;
+          if (p.id) matched = (marketplace || []).find(m => String(m.id) === String(p.id));
+          if (!matched) matched = (marketplace || []).find(m => m.name === p.name && m.owner === user);
+          return matched && matched.owner === user;
+        });
+      }).slice(0, 3);
+
+      let html = '';
+
+      // Build alert list: low stock, expiring inventory/listings, recent orders
+      if (lowStock.length === 0 && expiringInventory.length === 0 && expiringListings.length === 0 && recentOrders.length === 0) {
+        html = '<div class="alert-card"><div class="alert-title">All Clear</div><p class="alert-description">No low-stock, expiring items, or recent orders affecting your listings.</p></div>';
+      } else {
+        // Low stock alerts
+        lowStock.forEach(item => {
+          html += '<div class="alert-card">'
+               +     '<div class="alert-title">Low Stock: ' + escapeHtml(item.name) + '</div>'
+               +     '<p class="alert-description">' + (item.quantity || 0) + ' ' + (item.unit || '') + ' remaining — consider restocking.</p>'
+               + '</div>';
+        });
+
+        // Expiry alerts for inventory
+        expiringInventory.forEach(entry => {
+          const item = entry.item;
+          const d = entry.days;
+          const urgency = d <= urgentDays ? ' (Urgent)' : ' (Expires soon)';
+          html += '<div class="alert-card">'
+               +     '<div class="alert-title">Expiry' + urgency + ': ' + escapeHtml(item.name) + '</div>'
+               +     '<p class="alert-description">Expires in ' + (d === Infinity ? 'unknown' : d + ' day' + (d !== 1 ? 's' : '')) + ' — take action to sell or protect.</p>'
+               + '</div>';
+        });
+
+        // Expiry alerts for marketplace listings
+        expiringListings.forEach(entry => {
+          const item = entry.item;
+          const d = entry.days;
+          const urgency = d <= urgentDays ? ' (Urgent)' : ' (Expires soon)';
+          html += '<div class="alert-card">'
+               +     '<div class="alert-title">Listing Expiry' + urgency + ': ' + escapeHtml(item.name) + '</div>'
+               +     '<p class="alert-description">Listing expires in ' + (d === Infinity ? 'unknown' : d + ' day' + (d !== 1 ? 's' : '')) + ' — consider relisting or adjusting price.</p>'
+               + '</div>';
+        });
+
+        // Recent orders
+        recentOrders.forEach(order => {
+          const relevant = (order.products || order.items || []).filter(p => {
+            let matched = null;
+            if (p.id) matched = (marketplace || []).find(m => String(m.id) === String(p.id));
+            if (!matched) matched = (marketplace || []).find(m => m.name === p.name && m.owner === user);
+            return matched && matched.owner === user;
+          });
+
+          const productsText = relevant.map(p => escapeHtml(p.name) + ' x' + (p.quantity || 0)).join(', ');
+
+          html += '<div class="alert-card">'
+               +     '<div class="alert-title">New Order Received</div>'
+               +     '<p class="alert-description">Order #' + order.id + ' contains your products: ' + productsText + '</p>'
+               + '</div>';
+        });
+      }
+
+      alertsList.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Ensure alerts load on initial load as well
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSpoilageAlerts();
+    });
+
+    // --- Demand Forecast (Prototype) ---
+    function computeDailyDemand(orders, marketplace, user, daysBack = 30) {
+      const counts = {};
+      const today = new Date();
+      for (let i = 0; i < daysBack; i++) {
+        const d = new Date();
+        d.setDate(today.getDate() - (daysBack - 1 - i));
+        const key = d.toISOString().slice(0,10);
+        counts[key] = 0;
+      }
+
+      (orders || []).forEach(order => {
+        const dateStr = (order.orderDate || order.date || order.order_date || order.createdAt);
+        const d = dateStr ? new Date(dateStr) : null;
+        if (!d || isNaN(d)) return;
+        const key = d.toISOString().slice(0,10);
+        if (!(key in counts)) return; // out of window
+
+        const lines = (order.products || order.items || []);
+        lines.forEach(p => {
+          let matched = null;
+          if (p.id) matched = (marketplace || []).find(m => String(m.id) === String(p.id));
+          if (!matched) matched = (marketplace || []).find(m => m.name === p.name && m.owner === user);
+          if (matched && matched.owner === user) {
+            counts[key] += (p.quantity || 0);
+          }
+        });
+      });
+
+      const labels = Object.keys(counts);
+      const data = labels.map(l => counts[l] || 0);
+      return { labels, data };
+    }
+
+    function buildForecastFromHistory(historyData, horizon = 7) {
+      // Simple linear trend + moving average prototype
+      const data = historyData.slice();
+      const n = data.length;
+      if (n === 0) return { forecast: Array(horizon).fill(0), total: 0, confidence: 0 };
+
+      // moving average of last 7 days
+      const maWindow = Math.min(7, n);
+      const lastMA = data.slice(n - maWindow).reduce((s,v) => s+v,0) / maWindow;
+
+      // simple slope (linear) between first and last
+      const slope = (data[n-1] - data[0]) / Math.max(1, n-1);
+
+      const forecast = [];
+      for (let i = 1; i <= horizon; i++) {
+        // project as lastMA plus slope * i
+        const v = Math.max(0, Math.round(lastMA + slope * i));
+        forecast.push(v);
+      }
+
+      const total = forecast.reduce((s,v) => s+v, 0);
+      // rudimentary confidence: inverse of variance relative to mean
+      const mean = data.reduce((s,v) => s+v,0) / n;
+      const variance = data.reduce((s,v) => s + Math.pow(v - mean, 2), 0) / Math.max(1,n);
+      const conf = mean === 0 ? 0 : Math.max(0, Math.round(Math.max(0, 100 - (variance / (mean+1)) * 10)));
+      return { forecast, total, confidence: conf };
+    }
+
+    function loadDemandForecast() {
+      const user = getCurrentUser();
+      const marketplace = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
+      const orders = readOrders();
+
+      const hist = computeDailyDemand(orders, marketplace, user, 30);
+      const histLabels = hist.labels.map(l => l.slice(5)); // MM-DD
+      const histData = hist.data;
+
+      const f = buildForecastFromHistory(histData, 7);
+
+      // Update summary
+      const forecastTotalEl = document.getElementById('forecastTotal');
+      const forecastConfEl = document.getElementById('forecastConfidence');
+      const lastUpdatedEl = document.getElementById('demandLastUpdated');
+      if (forecastTotalEl) forecastTotalEl.textContent = (f.total || 0) + ' items';
+      if (forecastConfEl) forecastConfEl.textContent = 'Confidence: ' + (f.confidence || 0) + '%';
+      if (lastUpdatedEl) lastUpdatedEl.textContent = new Date().toLocaleTimeString();
+
+      // Create/Update chart
+      const ctx = document.getElementById('demandChart').getContext('2d');
+      const labels = histLabels.concat(Array.from({length: f.forecast.length}, (_,i) => '+' + (i+1)));
+      const series = histData.concat(f.forecast);
+
+      if (window._f2cDemandChart) {
+        window._f2cDemandChart.data.labels = labels;
+        window._f2cDemandChart.data.datasets[0].data = series;
+        window._f2cDemandChart.data.datasets[1].data = Array(histData.length).fill(null).concat(f.forecast);
+        window._f2cDemandChart.update();
+      } else {
+        window._f2cDemandChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Historical demand',
+                data: histData.concat(Array(f.forecast.length).fill(null)),
+                borderColor: '#4a90e2',
+                backgroundColor: 'rgba(74,144,226,0.08)',
+                fill: true,
+                tension: 0.3
+              },
+              {
+                label: 'Forecast (next 7 days)',
+                data: Array(histData.length).fill(null).concat(f.forecast),
+                borderColor: '#f39c12',
+                backgroundColor: 'rgba(243,156,18,0.08)',
+                borderDash: [6,4],
+                tension: 0.3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+    }
+
+    // Wire refresh button and live updates
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('refreshDemandBtn');
+      if (btn) btn.addEventListener('click', loadDemandForecast);
+      loadDemandForecast();
+      // Poll every 8 seconds for prototype "real-time" feel
+      setInterval(loadDemandForecast, 8000);
+    });
+
+    // Also refresh when storage or focus events occur
+    window.addEventListener('storage', loadDemandForecast);
+    window.addEventListener('focus', loadDemandForecast);
 
     // Product Sales Chart
     const productCtx = document.getElementById('productChart').getContext('2d');
@@ -577,6 +931,8 @@
         }
       }
     });
+    
+    // Add Product button removed — no action attached
   </script>
 </body>
 </html>

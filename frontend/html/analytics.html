@@ -200,7 +200,31 @@
   </style>
 </head>
 <body>
+  <!-- Primary navbar (loaded via component) -->
   <div id="navbar"></div>
+  
+  <!-- Fallback navbar (shown if component loading fails) -->
+  <div id="navbar-fallback" style="display: none;">
+    <nav class="main-navbar" style="background-color: #f8f9fa; border-bottom: 1px solid #e9ecef; position: sticky; top: 0; z-index: 1000;">
+      <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; min-height: 80px;">
+        <div style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #333;">
+          <div style="width: 40px; height: 40px; background-color: #5a8a59; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">F2C</div>
+          <div>
+            <h1 style="font-size: 18px; font-weight: 700; color: #333; margin: 0;">F2C Solutions</h1>
+            <p style="font-size: 12px; color: #666; margin: 0;">Farmer to Customer</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="../html/dashboard.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Dashboard</a>
+          <a href="../html/inventory.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Inventory</a>
+          <a href="../html/analytics.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px; background-color: #5a8a59; color: white;">Analytics</a>
+          <a href="../html/shop.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Marketplace</a>
+          <a href="../html/tracking.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Orders</a>
+          <a href="../html/auth.html" style="padding: 12px 16px; text-decoration: none; color: #666; border-radius: 8px;">Profile</a>
+        </div>
+      </div>
+    </nav>
+  </div>
 
   <main class="container my-4">
     <!-- Header -->
@@ -395,16 +419,29 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/components.js"></script>
+  <script src="../js/db.js"></script>
   <script>
     console.log('Loading navbar component...');
     
     // Load navbar component with error handling
     loadComponent("navbar", "../components/navbar.html").then(() => {
       console.log('Navbar component loaded successfully');
+      // Hide fallback navbar if main navbar loaded successfully
+      const fallback = document.getElementById('navbar-fallback');
+      if (fallback) {
+        fallback.style.display = 'none';
+      }
     }).catch((error) => {
       console.error('Failed to load navbar component:', error);
       
-      // Fallback: Try loading directly with fetch
+      // Show fallback navbar
+      const fallback = document.getElementById('navbar-fallback');
+      if (fallback) {
+        fallback.style.display = 'block';
+        console.log('Fallback navbar shown');
+      }
+      
+      // Try fallback method
       fetch('../components/navbar.html')
         .then(response => response.text())
         .then(html => {
@@ -412,6 +449,11 @@
           if (navbarElement) {
             navbarElement.innerHTML = html;
             console.log('Navbar loaded via fallback method');
+            // Hide fallback navbar if successful
+            const fallback = document.getElementById('navbar-fallback');
+            if (fallback) {
+              fallback.style.display = 'none';
+            }
           }
         })
         .catch(fallbackError => {
@@ -485,9 +527,9 @@
     }
 
     function updateMetrics() {
-      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const inventory = window.F2CDB ? F2CDB.readInventory() : (JSON.parse(localStorage.getItem('inventory')) || []);
       
       // Total products listed
       document.getElementById('totalProducts').textContent = marketplaceItems.length;
@@ -511,7 +553,7 @@
     }
 
     function updateProductsList() {
-      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       const container = document.getElementById('productsList');
       
       if (marketplaceItems.length === 0) {
@@ -769,7 +811,7 @@
     }
 
     function editProduct(productId) {
-      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       const product = marketplaceItems.find(item => item.id == productId);
       
       if (!product) {
@@ -808,12 +850,16 @@
         showToast(`${product.name} updated successfully`, 'success');
       }
       
-      localStorage.setItem('marketplaceItems', JSON.stringify(marketplaceItems));
+      if (window.F2CDB) {
+        F2CDB.writeMarketplace(marketplaceItems);
+      } else {
+        localStorage.setItem('marketplaceItems', JSON.stringify(marketplaceItems));
+      }
       updateAnalytics();
     }
 
     function removeFromMarketplace(productId) {
-      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       const product = marketplaceItems.find(item => item.id == productId);
       
       if (!product) {
@@ -826,14 +872,18 @@
       }
       
       const filteredItems = marketplaceItems.filter(item => item.id != productId);
-      localStorage.setItem('marketplaceItems', JSON.stringify(filteredItems));
+      if (window.F2CDB) {
+        F2CDB.writeMarketplace(filteredItems);
+      } else {
+        localStorage.setItem('marketplaceItems', JSON.stringify(filteredItems));
+      }
       
       showToast(`${product.name} removed from marketplace`, 'info');
       updateAnalytics();
     }
 
     function exportProducts() {
-      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       
       if (marketplaceItems.length === 0) {
         showToast('No products to export', 'warning');
@@ -871,7 +921,7 @@
 
     function filterExpiryItems() {
       const filter = document.getElementById('expiryFilter').value;
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const inventory = window.F2CDB ? F2CDB.readInventory() : (JSON.parse(localStorage.getItem('inventory')) || []);
       const container = document.getElementById('expiryList');
       
       const itemsWithExpiry = inventory.filter(item => item.expiryDate);
@@ -951,7 +1001,7 @@
     function updateCharts() {
       // Category Chart
       const ctx1 = document.getElementById('categoryChart').getContext('2d');
-      const marketplaceItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+      const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       
       // Group by category
       const categoryData = {};

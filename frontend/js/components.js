@@ -44,6 +44,10 @@ function loadComponent(elementId, componentPath) {
         });
         
         console.log(`Component '${elementId}' loaded successfully`);
+        // Dispatch a component-loaded event for in-page navigation hooks
+        try {
+          document.dispatchEvent(new CustomEvent('f2c:component-loaded', { detail: { elementId: elementId, componentPath: componentPath } }));
+        } catch (e) {}
         resolve();
       })
       .catch((error) => {

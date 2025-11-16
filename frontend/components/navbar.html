@@ -27,7 +27,7 @@
     <div class="navbar-menu" id="navbar-menu">
       <ul class="navbar-nav">
         <li class="nav-item" data-page="dashboard">
-          <a class="nav-link" href="../html/index.html">
+          <a class="nav-link" href="../html/dashboard.html">
             <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"/>
               <rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"/>
@@ -362,9 +362,20 @@
     navbarToggle.addEventListener('click', toggleMobileMenu);
   }
   
-  // Close mobile menu when clicking nav links
+  // Close mobile menu when clicking nav links and dispatch dashboard show event
   navLinks.forEach(link => {
-    link.addEventListener('click', closeMobileMenu);
+    link.addEventListener('click', function(e) {
+      closeMobileMenu();
+      try {
+        const href = this.getAttribute('href') || '';
+        const page = href.split('/').pop();
+        if (page === 'index.html' || page === 'dashboard.html') {
+          document.dispatchEvent(new CustomEvent('f2c:show-dashboard'));
+        }
+      } catch (err) {
+        // swallow
+      }
+    });
   });
   
   // Close mobile menu when clicking outside

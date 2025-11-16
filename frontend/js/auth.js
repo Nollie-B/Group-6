@@ -120,8 +120,8 @@
       console.log('Login successful for user:', email);
       
       setTimeout(() => {
-        // redirect to index.html in the html folder
-        window.location.href = '../html/index.html';
+        // redirect to dashboard.html (dynamic dashboard)
+        window.location.href = '../html/dashboard.html';
       }, 1000);
       
     } catch (error) {
