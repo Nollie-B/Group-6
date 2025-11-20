@@ -288,30 +288,7 @@
       margin: 0;
     }
     
-    .weather-widget {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-    
-    .weather-temp {
-      font-size: 2.2rem;
-      font-weight: 300;
-      margin: 8px 0;
-    }
-    
-    .weather-location {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      margin-bottom: 8px;
-    }
-    
-    .weather-condition {
-      font-size: 1rem;
-      font-weight: 500;
-    }
+    /* Weather widget removed (not used) */
   </style>
 </head>
 <body>
@@ -366,7 +343,7 @@
           <div class="metric-trend trend-up">
             <i class="fas fa-arrow-up me-1"></i>12%
           </div>
-          <div class="metric-value">$24,560</div>
+          <div class="metric-value">R24,560</div>
           <div class="metric-label">Monthly Revenue</div>
         </div>
       </div>
@@ -429,15 +406,7 @@
       
       <!-- Weather Widget -->
       <div class="col-lg-4">
-        <div class="weather-widget mb-4">
-          <div class="weather-location">
-            <i class="fas fa-map-marker-alt me-2"></i>Farm Location
-          </div>
-          <div class="weather-temp">72°F</div>
-          <div class="weather-condition">
-            <i class="fas fa-sun me-2"></i>Partly Cloudy
-          </div>
-        </div>
+        <!-- Weather widget removed -->
         
         <!-- Alerts -->
         <div class="card">
@@ -510,7 +479,7 @@
               </div>
               <div>
                 <div class="fw-bold">Payment Received</div>
-                <small class="text-muted">$189.50 from Customer #34</small>
+                <small class="text-muted">R189.50 from Customer #34</small>
               </div>
             </div>
             
@@ -672,8 +641,8 @@
           y: {
             beginAtZero: true,
             ticks: {
-              callback: function(value) {
-                return '$' + value.toLocaleString();
+                callback: function(value) {
+                return 'R' + value.toLocaleString();
               }
             }
           }

@@ -263,9 +263,9 @@
         <div class="metric-card">
           <div class="card-body text-center">
             <div class="metric-icon mx-auto" style="background: linear-gradient(135deg, #28a745 0%, #34ce57 100%); color: white;">
-              <i class="fas fa-dollar-sign"></i>
+              <i class="fas fa-coins"></i>
             </div>
-            <div class="metric-value" id="totalRevenue">$0</div>
+            <div class="metric-value" id="totalRevenue">R0</div>
             <div class="metric-label">Total Revenue</div>
           </div>
         </div>
@@ -469,6 +469,11 @@
       }, 500);
     });
 
+    // Listen for ordersUpdated events triggered by marketplace/checkout
+    window.addEventListener('ordersUpdated', function() {
+      updateAnalytics();
+    });
+
     function initializeAnalytics() {
       // Initialize orders if not exist
       let orders = JSON.parse(localStorage.getItem('orders')) || [];
@@ -538,8 +543,8 @@
       document.getElementById('totalOrders').textContent = orders.length;
       
       // Total revenue
-      const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-      document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toFixed(2);
+      const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || order.total || 0), 0);
+      document.getElementById('totalRevenue').textContent = 'R' + totalRevenue.toFixed(2);
       
       // Expiring soon (within 7 days)
       const expiringSoon = inventory.filter(item => {
@@ -597,7 +602,7 @@
             <div class="product-details">
               <div>
                 <small class="text-muted">${item.category}</small><br>
-                <strong>$${item.sellingPrice}/${item.unit}</strong>
+                <strong>R${item.sellingPrice}/${item.unit}</strong>
               </div>
               <div class="text-end">
                 <span class="badge bg-success">${item.quantity} ${item.unit}</span><br>
@@ -627,35 +632,43 @@
       }
       
       let html = '';
-      orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-      
+      orders.sort((a, b) => new Date(b.orderDate || b.date || b.order_date || 0) - new Date(a.orderDate || a.date || a.order_date || 0));
+
       orders.forEach(order => {
-        const orderDate = new Date(order.orderDate).toLocaleDateString();
-        const statusClass = `status-${order.status}`;
-        
+        const orderDate = new Date(order.orderDate || order.date || order.order_date || Date.now()).toLocaleDateString();
+        const status = (order.status || '').toString();
+        const statusClass = `status-${status.toLowerCase()}`;
+
+        // customer fields may be top-level or nested
+        const customerName = order.customerName || (order.customer && order.customer.name) || '';
+        const customerEmail = order.customerEmail || (order.customer && order.customer.email) || '';
+
+        const totalVal = (order.totalAmount || order.total || 0);
+        const items = order.products || order.items || [];
+
         const actionButtons = getOrderActionButtons(order);
         html += `
           <div class="order-card">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
                 <h6 class="mb-1">Order #${order.id}</h6>
-                <small class="text-muted">${order.customerName} • ${order.customerEmail}</small>
+                <small class="text-muted">${customerName} • ${customerEmail}</small>
               </div>
               <div class="text-end">
-                <span class="order-status ${statusClass}">${order.status.toUpperCase()}</span><br>
-                <small class="text-muted">$${order.totalAmount.toFixed(2)}</small>
+                <span class="order-status ${statusClass}">${status.toUpperCase()}</span><br>
+                <small class="text-muted">R${totalVal.toFixed(2)}</small>
               </div>
             </div>
             <div class="mb-2">
               <strong>Items:</strong>
-              ${order.products.map(product => 
-                `${product.name} (${product.quantity}x $${product.price})`
+              ${items.map(product => 
+                `${product.name} (${product.quantity}x R${(product.price || product.sellingPrice || 0)})`
               ).join(', ')}
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">
                 <i class="fas fa-calendar me-1"></i>${orderDate} • 
-                <i class="fas fa-map-marker-alt me-1"></i>${order.shippingAddress}
+                <i class="fas fa-map-marker-alt me-1"></i>${order.shippingAddress || ''}
               </small>
               <div class="btn-group btn-group-sm">
                 ${actionButtons}
@@ -715,47 +728,49 @@
 
     function getOrderActionButtons(order) {
       const buttons = [];
-      
-      if (order.status === 'pending') {
+      const s = (order.status || '').toString().toLowerCase();
+
+      if (s === 'pending') {
         buttons.push(`<button class="btn btn-success btn-sm" onclick="updateOrderStatus(${order.id}, 'confirmed')" title="Confirm Order">
           <i class="fas fa-check"></i> Confirm
         </button>`);
       }
-      
-      if (order.status === 'confirmed') {
+
+      if (s === 'confirmed') {
         buttons.push(`<button class="btn btn-primary btn-sm" onclick="updateOrderStatus(${order.id}, 'shipped')" title="Mark as Shipped">
           <i class="fas fa-truck"></i> Ship
         </button>`);
       }
-      
-      if (order.status === 'shipped') {
+
+      if (s === 'shipped') {
         buttons.push(`<button class="btn btn-info btn-sm" onclick="updateOrderStatus(${order.id}, 'delivered')" title="Mark as Delivered">
           <i class="fas fa-check-circle"></i> Delivered
         </button>`);
       }
-      
+
       return buttons.join('');
     }
 
     function updateOrderStatus(orderId, newStatus) {
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
       const orderIndex = orders.findIndex(order => order.id == orderId);
-      
+
       if (orderIndex === -1) {
         showToast('Order not found', 'error');
         return;
       }
-      
-      orders[orderIndex].status = newStatus;
+
+      const normalized = (newStatus || '').toString().toLowerCase();
+      orders[orderIndex].status = normalized;
       localStorage.setItem('orders', JSON.stringify(orders));
-      
+
       const statusMessages = {
         'confirmed': 'Order confirmed successfully!',
         'shipped': 'Order marked as shipped!',
         'delivered': 'Order marked as delivered!'
       };
-      
-      showToast(statusMessages[newStatus], 'success');
+
+      showToast(statusMessages[normalized] || 'Order status updated', 'success');
       updateAnalytics();
     }
 
@@ -783,14 +798,18 @@
       const csvContent = "data:text/csv;charset=utf-8," 
         + "Order ID,Customer Name,Customer Email,Total Amount,Status,Order Date,Shipping Address\n"
         + orders.map(order => {
+          const custName = order.customerName || (order.customer && order.customer.name) || '';
+          const custEmail = order.customerEmail || (order.customer && order.customer.email) || '';
+          const totalVal = (order.totalAmount || order.total || 0);
+          const dateStr = new Date(order.orderDate || order.date || order.order_date || Date.now()).toLocaleDateString();
           return [
             order.id,
-            `"${order.customerName}"`,
-            `"${order.customerEmail}"`,
-            order.totalAmount,
+            `"${custName}"`,
+            `"${custEmail}"`,
+            totalVal,
             order.status,
-            new Date(order.orderDate).toLocaleDateString(),
-            `"${order.shippingAddress}"`
+            dateStr,
+            `"${order.shippingAddress || ''}"`
           ].join(',');
         }).join('\n');
       
@@ -819,7 +838,7 @@
         return;
       }
       
-      const newPrice = prompt(`Enter new price for ${product.name} (current: $${product.sellingPrice}):`, product.sellingPrice);
+      const newPrice = prompt(`Enter new price for ${product.name} (current: R${product.sellingPrice}):`, product.sellingPrice);
       if (newPrice === null) return; // User cancelled
       
       const newQuantity = prompt(`Enter new quantity for ${product.name} (current: ${product.quantity} ${product.unit}):`, product.quantity);
@@ -1046,8 +1065,8 @@
       // Generate monthly revenue data
       const monthlyData = Array(12).fill(0);
       orders.forEach(order => {
-        const month = new Date(order.orderDate).getMonth();
-        monthlyData[month] += order.totalAmount;
+        const month = new Date(order.orderDate || order.date || order.order_date || Date.now()).getMonth();
+        monthlyData[month] += (order.totalAmount || order.total || 0);
       });
       
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1057,7 +1076,7 @@
         data: {
           labels: months,
           datasets: [{
-            label: 'Revenue ($)',
+              label: 'Revenue (R)',
             data: monthlyData,
             borderColor: '#5a8a59',
             backgroundColor: 'rgba(90, 138, 89, 0.1)',
@@ -1077,11 +1096,11 @@
           scales: {
             y: {
               beginAtZero: true,
-              ticks: {
-                callback: function(value) {
-                  return '$' + value;
+                ticks: {
+                  callback: function(value) {
+                    return 'R' + value;
+                  }
                 }
-              }
             }
           }
         }

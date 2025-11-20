@@ -174,30 +174,7 @@
       margin: 0;
     }
     
-    .weather-widget {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-    
-    .weather-temp {
-      font-size: 2.2rem;
-      font-weight: 300;
-      margin: 8px 0;
-    }
-    
-    .weather-location {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      margin-bottom: 8px;
-    }
-    
-    .weather-condition {
-      font-size: 1rem;
-      font-weight: 500;
-    }
+    /* Weather widget styles removed */
   </style>
 </head>
 <body>
@@ -248,7 +225,7 @@
             <i class="fas fa-arrow-up me-1"></i>
             <span id="monthlyTrend">0%</span>
           </div>
-          <div class="metric-value" id="monthlyRevenue">$0</div>
+          <div class="metric-value" id="monthlyRevenue">R0</div>
           <div class="metric-label">Monthly Revenue</div>
         </div>
       </div>
@@ -283,18 +260,8 @@
         </div>
       </div>
       
-      <!-- Weather Widget -->
+      <!-- Alerts + other right-column content -->
       <div class="col-lg-4">
-        <div class="weather-widget mb-4">
-          <div class="weather-location">
-            <i class="fas fa-map-marker-alt me-2"></i>Farm Location
-          </div>
-          <div class="weather-temp">72°F</div>
-          <div class="weather-condition">
-            <i class="fas fa-sun me-2"></i>Partly Cloudy
-          </div>
-        </div>
-        
         <!-- Alerts -->
         <div class="card">
           <div class="card-body">
@@ -351,11 +318,11 @@
             
             <div class="activity-item">
               <div class="activity-icon success">
-                <i class="fas fa-dollar-sign"></i>
+                <i class="fas fa-coins"></i>
               </div>
               <div>
                 <div class="fw-bold">Payment Received</div>
-                <small class="text-muted">$189.50 from Customer #34</small>
+                <small class="text-muted">R189.50 from Customer #34</small>
               </div>
             </div>
             
@@ -524,7 +491,7 @@
     }
 
     function formatCurrency(n) {
-      return '$' + (n || 0).toFixed(2);
+      return 'R' + (n || 0).toFixed(2);
     }
 
     // Compute per-user metrics and update UI
@@ -595,11 +562,11 @@
               tension: 0.4
             }]
           },
-          options: {
+            options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, ticks: { callback: function(v){ return '$' + v.toLocaleString(); } } } }
+            scales: { y: { beginAtZero: true, ticks: { callback: function(v){ return 'R' + v.toLocaleString(); } } } }
           }
         });
       }
@@ -635,6 +602,11 @@
 
     // Listen for custom events from in-page loaders or nav components
     document.addEventListener('f2c:show-dashboard', function() {
+      updateDashboardMetrics();
+    });
+
+    // Listen for ordersUpdated to refresh dashboard metrics in-page
+    window.addEventListener('ordersUpdated', function() {
       updateDashboardMetrics();
     });
 

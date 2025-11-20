@@ -434,6 +434,7 @@
               </div>
 
               <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-success">
                   <i class="fas fa-plus me-2"></i>Add to Inventory
                 </button>
                 <button type="button" class="btn btn-outline-secondary" id="sampleDataBtn">
@@ -896,7 +897,7 @@
           <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle me-1"></i>
             <strong>Already Listed:</strong> ${existingListing.quantity} ${existingListing.unit} currently on marketplace<br>
-            <strong>Current Price:</strong> $${existingListing.sellingPrice} per ${existingListing.unit}
+            <strong>Current Price:</strong> R${existingListing.sellingPrice} per ${existingListing.unit}
           </div>
         `;
       }
@@ -930,12 +931,12 @@
               <strong>Category:</strong> ${item.category}
             </div>
             <div class="col-md-6">
-              <strong>Cost Price:</strong> $${costPrice.toFixed(2)}<br>
-              <strong>Selling Price:</strong> $${sellingPrice.toFixed(2)}
+              <strong>Cost Price:</strong> R${costPrice.toFixed(2)}<br>
+              <strong>Selling Price:</strong> R${sellingPrice.toFixed(2)}
             </div>
           </div>
           ${potentialProfit > 0 ? 
-            `<div class="mt-2"><strong>Profit Potential:</strong> $${potentialProfit.toFixed(2)} per unit (${profitPercent}%)</div>` : 
+            `<div class="mt-2"><strong>Profit Potential:</strong> R${potentialProfit.toFixed(2)} per unit (${profitPercent}%)</div>` : 
             ''
           }
         </div>
@@ -943,8 +944,8 @@
         ${listingStatus}
         <div class="mt-2">
           <small class="text-muted">
-            <strong>Potential Revenue:</strong> $${estimatedRevenue.toFixed(2)} 
-            ${estimatedProfit > 0 ? `| <strong>Potential Profit:</strong> $${estimatedProfit.toFixed(2)}` : ''}
+            <strong>Potential Revenue:</strong> R${estimatedRevenue.toFixed(2)} 
+            ${estimatedProfit > 0 ? `| <strong>Potential Profit:</strong> R${estimatedProfit.toFixed(2)}` : ''}
           </small>
         </div>
       `;

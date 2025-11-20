@@ -61,13 +61,32 @@
             Marketplace
           </a>
         </li>
-        <li class="nav-item" data-page="orders">
-          <a class="nav-link" href="../html/tracking.html">
+        <li class="nav-item" data-page="orders" id="ordersNavItem">
+          <a class="nav-link" href="../html/tracking.html" id="ordersNavLink">
             <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M14 2H6C5.5 2 5 2.45 5 3V21C5 21.55 5.45 22 6 22H18C18.55 22 19 21.55 19 21V7L14 2ZM18 20H6V4H13V9H18V20Z" fill="currentColor"/>
             </svg>
             Orders
+            <span class="orders-badge" id="ordersBadge" style="display:none">0</span>
           </a>
+
+          <!-- Orders preview dropdown (shows up on hover/click) -->
+          <div class="orders-dropdown" id="ordersDropdown" aria-hidden="true">
+            <div class="orders-dropdown-inner">
+              <!-- Render the same Recent Orders card used on tracking.html here -->
+              <div class="order-card" style="margin:0;">
+                <h3 class="h5 mb-3">Recent Orders</h3>
+                <div id="ordersContainerNavbar">
+                  <div class="text-center text-muted py-4">
+                    <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                    <p>No orders found</p>
+                    <small>Orders will appear here when customers make purchases</small>
+                  </div>
+                </div>
+              </div>
+              <div class="orders-footer"><a href="../html/tracking.html">View All Orders</a></div>
+            </div>
+          </div>
         </li>
         <li class="nav-item" data-page="profile">
           <a class="nav-link" href="../html/auth.html">
@@ -196,6 +215,7 @@
 
 .nav-item {
   margin: 0;
+  position: relative;
 }
 
 .nav-link {
@@ -237,6 +257,40 @@
 .nav-link:hover .nav-icon {
   color: #5a8a59;
 }
+
+/* Orders dropdown preview */
+.orders-badge {
+  background: #5a8a59;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.orders-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 320px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 8px;
+  display: none;
+  z-index: 10000;
+}
+
+.orders-dropdown-inner { max-height: 300px; overflow: auto; }
+.orders-list { list-style: none; margin: 0; padding: 0; }
+.orders-list li { padding: 8px; border-bottom: 1px solid #f1f1f1; font-size: 13px; }
+.orders-list li:last-child { border-bottom: none; }
+.orders-list .order-id { font-weight: 600; margin-right: 6px; }
+.orders-list .order-meta { color: #6c757d; font-size: 12px; }
+.orders-footer { padding: 8px; text-align: center; }
+.orders-loading { padding: 16px; text-align: center; color: #6c757d; }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
@@ -372,6 +426,11 @@
         if (page === 'index.html' || page === 'dashboard.html') {
           document.dispatchEvent(new CustomEvent('f2c:show-dashboard'));
         }
+
+        // If the Orders link is clicked, notify any open Orders page to refresh
+        if (page === 'tracking.html') {
+          document.dispatchEvent(new CustomEvent('f2c:show-orders'));
+        }
       } catch (err) {
         // swallow
       }
@@ -399,5 +458,109 @@
     initActiveState();
   });
   
+})();
+
+// Orders preview dropdown population
+(function() {
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(); } catch (e) { return iso; }
+  }
+
+  const ordersNavItem = document.getElementById('ordersNavItem');
+  const ordersDropdown = document.getElementById('ordersDropdown');
+  const ordersContainerNavbar = document.getElementById('ordersContainerNavbar');
+  const ordersBadge = document.getElementById('ordersBadge');
+
+  function populateOrdersPreview() {
+    if (!ordersContainerNavbar) return;
+
+    ordersContainerNavbar.innerHTML = '';
+
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const count = orders.length;
+
+    if (ordersBadge) {
+      if (count > 0) { ordersBadge.style.display = 'inline-block'; ordersBadge.textContent = count; }
+      else { ordersBadge.style.display = 'none'; }
+    }
+
+    if (count === 0) {
+      ordersContainerNavbar.innerHTML = `
+        <div class="text-center text-muted py-4">
+          <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+          <p>No orders found</p>
+          <small>Orders will appear here when customers make purchases</small>
+        </div>`;
+      return;
+    }
+
+    // Show up to 5 most recent orders (render similar structure to tracking page)
+    const recent = orders.slice().reverse().slice(0,5);
+    ordersContainerNavbar.innerHTML = recent.map(order => `
+      <div class="order-card" style="margin-bottom:10px;">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <div class="order-id">Order #${order.id}</div>
+            <div class="order-date">${formatDate(order.date || order.orderDate || order.order_date)}</div>
+          </div>
+          <span class="status-badge status-${(order.status || '').toString().toLowerCase()}">${((order.status || '').toString().charAt(0) || '').toUpperCase() + ((order.status || '').toString().slice(1) || '')}</span>
+        </div>
+        <div class="order-items">
+          ${ (order.items || []).map(item => `
+            <div class="order-item">
+              <span>${item.name} x${item.quantity}</span>
+              <span>R${((item.price||0) * (item.quantity||0)).toFixed(2)}</span>
+            </div>
+          `).join('') }
+        </div>
+        <div class="order-total">
+          <span>Total</span>
+          <span>R${((order.total||order.totalAmount||0)).toFixed(2)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  if (ordersNavItem) {
+    // show on hover / focus
+    ordersNavItem.addEventListener('mouseenter', function() {
+      populateOrdersPreview();
+      ordersDropdown.style.display = 'block';
+      ordersDropdown.setAttribute('aria-hidden','false');
+    });
+    ordersNavItem.addEventListener('mouseleave', function() {
+      ordersDropdown.style.display = 'none';
+      ordersDropdown.setAttribute('aria-hidden','true');
+    });
+
+    // also show on click (useful for mobile) and prevent navigation when dropdown hidden
+    const ordersNavLink = document.getElementById('ordersNavLink');
+    if (ordersNavLink) {
+      ordersNavLink.addEventListener('click', function(e) {
+        // If dropdown is hidden, show it instead of navigating
+        if (ordersDropdown.style.display === 'none') {
+          e.preventDefault();
+          populateOrdersPreview();
+          ordersDropdown.style.display = 'block';
+          ordersDropdown.setAttribute('aria-hidden','false');
+        }
+        // Otherwise allow default navigation to tracking.html
+      });
+    }
+  }
+
+  // Update badge when orders change via storage events
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'orders') populateOrdersPreview();
+  });
+
+  // Update when the app dispatches an in-page ordersUpdated event
+  window.addEventListener('ordersUpdated', function() {
+    populateOrdersPreview();
+  });
+
+  // initial populate
+  try { populateOrdersPreview(); } catch (e) {}
+
 })();
 </script>
