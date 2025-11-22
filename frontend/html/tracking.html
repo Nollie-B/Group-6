@@ -424,53 +424,80 @@
     });
 
     function loadOrders() {
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
       const container = document.getElementById('ordersContainer');
-      
-      if (orders.length === 0) {
+
+      const getCurrent = (window.F2CDB && F2CDB.getCurrentUser) ? F2CDB.getCurrentUser : () => localStorage.getItem('pp_loggedInUser');
+      const currentUser = getCurrent();
+
+      // Filter to orders that include this user's marketplace items (match Analytics behavior)
+      const myOrders = allOrders.filter(order => {
+        const items = order.items || order.products || [];
+        return Array.isArray(items) && items.some(it => (it && (it.owner || it.owner === 0)) && String(it.owner) === String(currentUser));
+      });
+
+      if (myOrders.length === 0) {
         container.innerHTML = `
           <div class="text-center text-muted py-4">
             <i class="fas fa-shopping-cart fa-3x mb-3"></i>
-            <p>No orders found</p>
-            <small>Orders will appear here when customers make purchases</small>
+            <h5 class="text-muted">No orders for your listings yet</h5>
+            <p class="text-muted">Orders for your products will appear here when customers purchase them.</p>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = orders.slice().reverse().map(order => `
-        <div class="order-card">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-              <div class="order-id">Order #${order.id}</div>
-              <div class="order-date">${new Date(order.date || order.orderDate || order.order_date).toLocaleDateString()}</div>
-            </div>
-            <span class="status-badge status-${(order.status || '').toString().toLowerCase()}">${((order.status || '').toString().charAt(0) || '').toUpperCase() + ((order.status || '').toString().slice(1) || '')}</span>
-          </div>
-          
-          <div class="order-items">
-            ${order.items.map(item => `
-              <div class="order-item">
-                <span>${item.name} x${item.quantity}</span>
-                <span>R${(item.price * item.quantity).toFixed(2)}</span>
+      // Render orders relevant to this user, newest first
+      myOrders.sort((a, b) => new Date(b.orderDate || b.date || b.order_date || 0) - new Date(a.orderDate || a.date || a.order_date || 0));
+
+      let html = '';
+      myOrders.forEach(order => {
+        const orderDate = new Date(order.orderDate || order.date || order.order_date || Date.now()).toLocaleDateString();
+        const status = (order.status || '').toString();
+        const statusClass = `status-${status.toLowerCase()}`;
+
+        const customerName = order.customerName || (order.customer && order.customer.name) || '';
+        const customerEmail = order.customerEmail || (order.customer && order.customer.email) || '';
+
+        const totalVal = (order.totalAmount || order.total || 0);
+        const items = order.items || order.products || [];
+
+        const actionButtons = getOrderActions(order);
+
+        html += `
+          <div class="order-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <div class="order-id">Order #${order.id}</div>
+                <div class="order-date">${customerName} • ${customerEmail}</div>
               </div>
-            `).join('')}
+              <div class="text-end">
+                <span class="status-badge ${statusClass}">${status.toUpperCase()}</span><br>
+                <small class="text-muted">R${totalVal.toFixed(2)}</small>
+              </div>
+            </div>
+            <div class="order-items">
+              <strong>Items:</strong>
+              <div>
+                ${items.map(product => `
+                  <div class="order-item">
+                    <span>${product.name} (${product.quantity}x R${((product.price || product.sellingPrice) || 0)})</span>
+                    <span>R${(((product.price || product.sellingPrice) || 0) * (product.quantity || 0)).toFixed(2)}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">${orderDate} • ${order.shippingAddress || ''}</small>
+                <div>${actionButtons} <button class="action-btn btn-delete" onclick="deleteOrder(${order.id})">Delete</button></div>
+              </div>
+            </div>
           </div>
-          
-          <div class="order-total">
-            <span>Total</span>
-            <span>R${(order.total || order.totalAmount || 0).toFixed(2)}</span>
-          </div>
-          
-          <div class="mt-3">
-            <small class="text-muted">Customer: ${order.customer.name} | ${order.customer.email}</small>
-          </div>
-          
-          <div class="mt-3">
-            ${getOrderActions(order)}
-          </div>
-        </div>
-      `).join('');
+        `;
+      });
+
+      container.innerHTML = html;
     }
 
     function getOrderActions(order) {
@@ -527,16 +554,40 @@
     }
 
     function updateStatistics() {
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      
+      const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+
+      const getCurrent = (window.F2CDB && F2CDB.getCurrentUser) ? F2CDB.getCurrentUser : () => localStorage.getItem('pp_loggedInUser');
+      const currentUser = getCurrent();
+
+      // Filter orders to those that contain at least one item owned by the current user
+      function ordersForUser(orders, user) {
+        if (!user) return [];
+        return orders.filter(o => {
+          const items = o.items || o.products || [];
+          return Array.isArray(items) && items.some(it => (it && (it.owner || it.owner === 0)) && String(it.owner) === String(user));
+        });
+      }
+
+      const orders = ordersForUser(allOrders, currentUser);
+
       document.getElementById('totalOrders').textContent = orders.length;
       document.getElementById('pendingOrders').textContent = orders.filter(o => (o.status || '').toString().toLowerCase() === 'pending').length;
       document.getElementById('completedOrders').textContent = orders.filter(o => (o.status || '').toString().toLowerCase() === 'delivered').length;
 
+      // Revenue: sum only the line items that belong to the current user and are in delivered orders
       const totalRevenue = orders
         .filter(o => (o.status || '').toString().toLowerCase() === 'delivered')
-        .reduce((sum, order) => sum + (order.total || order.totalAmount || 0), 0);
-      
+        .reduce((sum, order) => {
+          const items = order.items || order.products || [];
+          const userItemSum = (items || []).reduce((s, it) => {
+            if (it && String(it.owner) === String(currentUser)) {
+              return s + ((it.price || it.sellingPrice || 0) * (it.quantity || 0));
+            }
+            return s;
+          }, 0);
+          return sum + userItemSum;
+        }, 0);
+
       document.getElementById('totalRevenue').textContent = `R${totalRevenue.toFixed(2)}`;
     }
 
@@ -703,15 +754,27 @@
     let orderStatusChart = null;
 
     function updateChart() {
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+
+      const getCurrent = (window.F2CDB && F2CDB.getCurrentUser) ? F2CDB.getCurrentUser : () => localStorage.getItem('pp_loggedInUser');
+      const currentUser = getCurrent();
+
+      function ordersForUser(orders, user) {
+        if (!user) return [];
+        return orders.filter(o => {
+          const items = o.items || o.products || [];
+          return Array.isArray(items) && items.some(it => (it && (it.owner || it.owner === 0)) && String(it.owner) === String(user));
+        });
+      }
+
+      const orders = ordersForUser(allOrders, currentUser);
+
       const statusKeys = ['pending', 'confirmed', 'shipped', 'delivered'];
       const statusCounts = { pending: 0, confirmed: 0, shipped: 0, delivered: 0 };
 
       orders.forEach(order => {
         const s = (order.status || '').toString().toLowerCase();
-        if (statusCounts.hasOwnProperty(s)) {
-          statusCounts[s]++;
-        }
+        if (statusCounts.hasOwnProperty(s)) statusCounts[s]++;
       });
 
       const ctx = document.getElementById('orderStatusChart').getContext('2d');

@@ -230,7 +230,7 @@
     <!-- Header -->
     <div class="analytics-header">
       <h1><i class="fas fa-chart-line me-3"></i>Analytics & Insights</h1>
-      <p>Track your farm's performance, listed products, and customer orders</p>
+      <p id="analyticsUser">Track your farm's performance, listed products, and customer orders</p>
     </div>
 
     <!-- Key Metrics -->
@@ -532,22 +532,46 @@
     }
 
     function updateMetrics() {
+      const currentUser = window.F2CDB ? F2CDB.getCurrentUser() : null;
+      const username = window.F2CDB ? F2CDB.getUsername(currentUser) : currentUser;
+
+      // show username in header
+      const analyticsUserEl = document.getElementById('analyticsUser');
+      if (analyticsUserEl) analyticsUserEl.textContent = `Analytics for ${username || 'Guest'}`;
+
       const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      const inventory = window.F2CDB ? F2CDB.readInventory() : (JSON.parse(localStorage.getItem('inventory')) || []);
-      
-      // Total products listed
-      document.getElementById('totalProducts').textContent = marketplaceItems.length;
-      
-      // Total orders
-      document.getElementById('totalOrders').textContent = orders.length;
-      
-      // Total revenue
-      const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || order.total || 0), 0);
+
+      // Only consider items the current user listed
+      const myMarketplace = marketplaceItems.filter(item => item.owner === currentUser);
+
+      // Total products listed (by this user)
+      document.getElementById('totalProducts').textContent = myMarketplace.length;
+
+      // Orders that include this user's listings
+      const myOrders = orders.filter(order => {
+        const items = order.items || order.products || [];
+        return items.some(it => (it.owner || it.owner === 0) && String(it.owner) === String(currentUser));
+      });
+
+      // Total orders (relevant to this user's listings)
+      document.getElementById('totalOrders').textContent = myOrders.length;
+
+      // Total revenue (sum of order items that belong to this user)
+      const totalRevenue = myOrders.reduce((sum, order) => {
+        const items = order.items || order.products || [];
+        const revenueForUser = items.reduce((s, it) => {
+          if (String(it.owner) === String(currentUser)) {
+            return s + ((it.price || it.sellingPrice || 0) * (it.quantity || 0));
+          }
+          return s;
+        }, 0);
+        return sum + revenueForUser;
+      }, 0);
       document.getElementById('totalRevenue').textContent = 'R' + totalRevenue.toFixed(2);
-      
-      // Expiring soon (within 7 days)
-      const expiringSoon = inventory.filter(item => {
+
+      // Expiring soon among the user's marketplace listings (within 7 days)
+      const expiringSoon = myMarketplace.filter(item => {
         if (!item.expiryDate) return false;
         const expiryDate = new Date(item.expiryDate);
         const today = new Date();
@@ -559,21 +583,23 @@
 
     function updateProductsList() {
       const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
+      const currentUser = window.F2CDB ? F2CDB.getCurrentUser() : null;
+      const myMarketplace = marketplaceItems.filter(item => item.owner === currentUser);
       const container = document.getElementById('productsList');
-      
-      if (marketplaceItems.length === 0) {
+
+      if (myMarketplace.length === 0) {
         container.innerHTML = `
           <div class="text-center py-5">
             <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-            <h5 class="text-muted">No products listed yet</h5>
-            <p class="text-muted">Start by adding items to your marketplace from the inventory page.</p>
+            <h5 class="text-muted">You have no products listed yet</h5>
+            <p class="text-muted">Add items to your marketplace from the inventory page to see analytics here.</p>
           </div>
         `;
         return;
       }
-      
+
       let html = '';
-      marketplaceItems.forEach(item => {
+      myMarketplace.forEach(item => {
         const categoryEmoji = {
           '🌾 Grains & Seeds': '🌾',
           '🌿 Herbs': '🌿',
@@ -619,22 +645,29 @@
     function updateOrdersList() {
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
       const container = document.getElementById('ordersList');
-      
-      if (orders.length === 0) {
+      const currentUser = window.F2CDB ? F2CDB.getCurrentUser() : null;
+
+      // Filter to orders that include this user's marketplace items
+      const myOrders = orders.filter(order => {
+        const items = order.items || order.products || [];
+        return items.some(it => String(it.owner) === String(currentUser));
+      });
+
+      if (myOrders.length === 0) {
         container.innerHTML = `
           <div class="text-center py-5">
             <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-            <h5 class="text-muted">No orders yet</h5>
-            <p class="text-muted">Customer orders will appear here when they make purchases.</p>
+            <h5 class="text-muted">No orders for your listings yet</h5>
+            <p class="text-muted">Orders for your products will appear here when customers purchase them.</p>
           </div>
         `;
         return;
       }
-      
-      let html = '';
-      orders.sort((a, b) => new Date(b.orderDate || b.date || b.order_date || 0) - new Date(a.orderDate || a.date || a.order_date || 0));
 
-      orders.forEach(order => {
+      let html = '';
+      myOrders.sort((a, b) => new Date(b.orderDate || b.date || b.order_date || 0) - new Date(a.orderDate || a.date || a.order_date || 0));
+
+      myOrders.forEach(order => {
         const orderDate = new Date(order.orderDate || order.date || order.order_date || Date.now()).toLocaleDateString();
         const status = (order.status || '').toString();
         const statusClass = `status-${status.toLowerCase()}`;
@@ -1022,18 +1055,26 @@
       const ctx1 = document.getElementById('categoryChart').getContext('2d');
       const marketplaceItems = window.F2CDB ? F2CDB.readMarketplace() : (JSON.parse(localStorage.getItem('marketplaceItems')) || []);
       
-      // Group by category
+      // Determine current user and their marketplace listings
+      const currentUser = window.F2CDB ? F2CDB.getCurrentUser() : null;
+      const myMarketplace = marketplaceItems.filter(item => item.owner === currentUser);
+
+      // Group by category for the user's listings
       const categoryData = {};
-      marketplaceItems.forEach(item => {
-        categoryData[item.category] = (categoryData[item.category] || 0) + item.quantity;
+      myMarketplace.forEach(item => {
+        categoryData[item.category] = (categoryData[item.category] || 0) + (item.quantity || 0);
       });
+
+      // If there's no category data, show a placeholder label so Chart.js doesn't error
+      const categoryLabels = Object.keys(categoryData).length ? Object.keys(categoryData) : ['No data'];
+      const categoryValues = Object.keys(categoryData).length ? Object.values(categoryData) : [0];
       
       new Chart(ctx1, {
         type: 'doughnut',
         data: {
-          labels: Object.keys(categoryData),
+          labels: categoryLabels,
           datasets: [{
-            data: Object.values(categoryData),
+            data: categoryValues,
             backgroundColor: [
               '#5a8a59',
               '#6b9c6d',
@@ -1062,12 +1103,23 @@
       const ctx2 = document.getElementById('revenueChart').getContext('2d');
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
       
-      // Generate monthly revenue data
+      // Generate monthly revenue data only for this user's items
       const monthlyData = Array(12).fill(0);
       orders.forEach(order => {
         const month = new Date(order.orderDate || order.date || order.order_date || Date.now()).getMonth();
-        monthlyData[month] += (order.totalAmount || order.total || 0);
+        const items = order.items || order.products || [];
+        const revenueForUser = items.reduce((s, it) => {
+          if (String(it.owner) === String(currentUser)) {
+            return s + ((it.price || it.sellingPrice || 0) * (it.quantity || 0));
+          }
+          return s;
+        }, 0);
+        monthlyData[month] += revenueForUser;
       });
+
+      // If all months are zero, show a small placeholder so chart renders cleanly
+      const hasRevenue = monthlyData.some(v => v > 0);
+      const revenueData = hasRevenue ? monthlyData : Array(12).fill(0);
       
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       
@@ -1077,7 +1129,7 @@
           labels: months,
           datasets: [{
               label: 'Revenue (R)',
-            data: monthlyData,
+            data: revenueData,
             borderColor: '#5a8a59',
             backgroundColor: 'rgba(90, 138, 89, 0.1)',
             borderWidth: 3,

@@ -25,9 +25,9 @@
     const users = readUsers();
     const hasAdmin = users.some(u => u.email === 'admin');
     if (!hasAdmin) {
-      users.push({ email: 'admin', password: 'admin' });
+      users.push({ email: 'admin', password: 'admin', username: 'Admin' });
       writeUsers(users);
-      console.log('Seeded admin user (email: admin / password: admin)');
+      console.log('Seeded admin user (email: admin / password: admin / username: Admin)');
     }
   }
 
@@ -144,17 +144,18 @@
     }
 
     const email = (form.querySelector('input[name="email"]') || {}).value?.trim() || '';
+    const username = (form.querySelector('input[name="username"]') || {}).value?.trim() || '';
     const password = (form.querySelector('input[name="password"]') || {}).value || '';
     const confirm = (form.querySelector('input[name="confirm"]') || {}).value || '';
 
-    console.log('Signup attempt:', { email, password: password ? '***' : 'empty', confirm: confirm ? '***' : 'empty' });
+    console.log('Signup attempt:', { email, username, password: password ? '***' : 'empty', confirm: confirm ? '***' : 'empty' });
 
     // Clear previous messages
     clearMessage(messageContainer);
     setButtonLoading(button, true);
 
     // Validation
-    if (!email || !password || !confirm) {
+    if (!email || !username || !password || !confirm) {
       showMessage(messageContainer, 'Please fill all fields', 'error');
       setButtonLoading(button, false);
       return;
@@ -180,13 +181,13 @@
     }
 
     try {
-      // Add new user
-      users.push({ email, password });
+      // Add new user with username
+      users.push({ email, username, password });
       writeUsers(users);
       
       showMessage(messageContainer, 'Account created successfully! You can now login.', 'success');
       
-      console.log('New user created:', email);
+      console.log('New user created:', { email, username });
       
       // Switch to login view after delay
       setTimeout(() => {

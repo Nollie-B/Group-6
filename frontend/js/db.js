@@ -1,6 +1,7 @@
 // Simple NoSQL-like localStorage helpers for per-user data
 (function() {
   const LOGGED_IN_KEY = 'pp_loggedInUser';
+  const USERS_KEY = 'pp_users';
 
   function sanitizeKeyPart(s) {
     if (!s) return 'anon';
@@ -9,6 +10,16 @@
 
   function getCurrentUser() {
     return localStorage.getItem(LOGGED_IN_KEY) || null;
+  }
+
+  function getUsername(email) {
+    try {
+      const users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+      const user = users.find(u => u.email === email);
+      return user ? user.username : email;
+    } catch (e) {
+      return email;
+    }
   }
 
   function inventoryKeyFor(user) {
@@ -56,6 +67,7 @@
   // Export helpers
   window.F2CDB = {
     getCurrentUser,
+    getUsername,
     readInventory,
     writeInventory,
     readMarketplace,
