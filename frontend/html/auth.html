@@ -1,433 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>Login & Registration Form</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    /* Reset and base styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Login & Registration Form</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    body {
-      min-height: 100vh;
-      width: 100%;
-      background: linear-gradient(135deg, #009579 0%, #20c997 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .auth-container {
-      max-width: 430px;
-      width: 90%;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .auth-container .registration {
-      display: none;
-    }
-
-    #check:checked ~ .registration {
-      display: block;
-    }
-
-    #check:checked ~ .login {
-      display: none;
-    }
-
-    #check {
-      display: none;
-    }
-
-    .auth-form {
-      padding: 2.5rem;
-    }
-
-    .form-header {
-      font-size: 2rem;
-      font-weight: 600;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #333;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-input {
-      width: 100%;
-      height: 55px;
-      padding: 0 15px;
-      font-size: 16px;
-      border: 2px solid #e9ecef;
-      border-radius: 8px;
-      outline: none;
-      transition: all 0.3s ease;
-      background-color: #f8f9fa;
-    }
-
-    .form-input:focus {
-      border-color: #009579;
-      background-color: #fff;
-      box-shadow: 0 0 0 3px rgba(0, 149, 121, 0.1);
-    }
-
-    .form-input::placeholder {
-      color: #adb5bd;
-    }
-
-    .forgot-password {
-      font-size: 14px;
-      color: #009579;
-      text-decoration: none;
-      text-align: right;
-      display: block;
-      margin-top: -0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .forgot-password:hover {
-      text-decoration: underline;
-    }
-
-    .btn-auth {
-      width: 100%;
-      height: 55px;
-      color: #fff;
-      background: linear-gradient(135deg, #009579 0%, #20c997 100%);
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .btn-auth:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 149, 121, 0.4);
-    }
-
-    .auth-switch {
-      font-size: 16px;
-      text-align: center;
-      margin-top: 1.5rem;
-      color: #6c757d;
-    }
-
-    .auth-switch label {
-      color: #009579;
-      cursor: pointer;
-      font-weight: 500;
-      text-decoration: none;
-    }
-
-    .auth-switch label:hover {
-      text-decoration: underline;
-    }
-
-    /* Message styles */
-    .message {
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      display: none;
-      animation: slideIn 0.3s ease;
-    }
-
-    .message.success {
-      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .message.error {
-      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .message.info {
-      background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
+    <style>
+      /* Reset and base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+
+      body {
+        min-height: 100vh;
+        width: 100%;
+        background: linear-gradient(135deg, #009579 0%, #20c997 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
       }
-    }
 
-    /* Loading state */
-    .btn-auth.loading {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .btn-auth.loading::after {
-      content: '';
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid transparent;
-      border-top: 2px solid #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-left: 8px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Responsive design */
-    @media (max-width: 480px) {
       .auth-container {
-        width: 95%;
-        margin: 20px;
+        max-width: 430px;
+        width: 90%;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        position: relative;
       }
-      
+
+      .auth-container .registration {
+        display: none;
+      }
+
+      #check:checked ~ .registration {
+        display: block;
+      }
+
+      #check:checked ~ .login {
+        display: none;
+      }
+
+      #check {
+        display: none;
+      }
+
       .auth-form {
-        padding: 2rem 1.5rem;
+        padding: 2.5rem;
       }
-      
+
       .form-header {
-        font-size: 1.7rem;
+        font-size: 2rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #333;
       }
-      
-      .form-input, .btn-auth {
-        height: 50px;
+
+      .form-group {
+        margin-bottom: 1.5rem;
       }
-    }
 
-    /* Logo section */
-    .auth-logo {
-      text-align: center;
-      padding: 2rem 2.5rem 0;
-    }
+      .form-input {
+        width: 100%;
+        height: 55px;
+        padding: 0 15px;
+        font-size: 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        outline: none;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+      }
 
-    .logo-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #009579 0%, #20c997 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1rem;
-    }
-    
-    .logo-icon img {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-    }
+      .form-input:focus {
+        border-color: #009579;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(0, 149, 121, 0.1);
+      }
 
-    .logo-text h1 {
-      font-size: 1.5rem;
-      color: #333;
-      margin: 0;
-      font-weight: 600;
-    }
+      .form-input::placeholder {
+        color: #adb5bd;
+      }
 
-    .logo-text p {
-      font-size: 0.9rem;
-      color: #6c757d;
-      margin: 0.25rem 0 0;
-    }
-  </style>
-</head>
-<body>
-  <div class="auth-container">
-    <input type="checkbox" id="check" />
+      .forgot-password {
+        font-size: 14px;
+        color: #009579;
+        text-decoration: none;
+        text-align: right;
+        display: block;
+        margin-top: -0.5rem;
+        margin-bottom: 1rem;
+      }
 
-    <div class="auth-logo">
-      <div class="logo-icon">
-        <img src="../assets/f2c_logo.svg" alt="F2C Logo" width="40" height="40" />
-      </div>
-      <div class="logo-text">
-        <h1>F2C Solutions</h1>
-        <p>Farmer to Customer</p>
-      </div>
-    </div>
+      .forgot-password:hover {
+        text-decoration: underline;
+      }
 
-    <div class="login auth-form">
-      <header class="form-header">Welcome Back</header>
-      <form class="login-form" id="loginForm">
-        <div class="message login-message" aria-live="polite"></div>
-        
-        <div class="form-group">
-          <input type="text" name="email" class="form-input" placeholder="Enter your email" required autocomplete="email" />
-        </div>
-        
-        <div class="form-group">
-          <input type="password" name="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password" />
-        </div>
-        
-        <a href="#" class="forgot-password">Forgot password?</a>
-        
-        <button type="button" class="btn-auth login-btn" id="loginButton">Login</button>
-        
-        <div class="auth-switch">
-          Don't have an account?
-          <label for="check">Sign Up</label>
-        </div>
-      </form>
-    </div>
+      .btn-auth {
+        width: 100%;
+        height: 55px;
+        color: #fff;
+        background: linear-gradient(135deg, #009579 0%, #20c997 100%);
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-    <div class="registration auth-form">
-      <header class="form-header">Create Account</header>
-      <form class="signup-form" id="signupForm">
-        <div class="message signup-message" aria-live="polite"></div>
-        
-        <div class="form-group">
-          <input type="text" name="email" class="form-input" placeholder="Enter your email" required autocomplete="email" />
-        </div>
-        
-        <div class="form-group">
-          <input type="text" name="username" class="form-input" placeholder="Choose a username" required />
-        </div>
-        
-        <div class="form-group">
-          <input type="password" name="password" class="form-input" placeholder="Create a password" required autocomplete="new-password" />
-        </div>
-        
-        <div class="form-group">
-          <input type="password" name="confirm" class="form-input" placeholder="Confirm your password" required autocomplete="new-password" />
-        </div>
-        
-        <button type="button" class="btn-auth signup-btn" id="signupButton">Create Account</button>
-        
-        <div class="auth-switch">
-          Already have an account?
-          <label for="check">Login</label>
-        </div>
-      </form>
-    </div>
-  </div>
+      .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 149, 121, 0.4);
+      }
 
-  <script src="../js/auth.js"></script>
-  <script>
-    // Enhanced debugging and error handling
-    console.log('Auth page loaded successfully');
-    
-    // Test if elements are found and event listeners work
-    function debugAuthPage() {
-      console.log('🔍 Debug: Checking auth page elements...');
-      
-      const elements = {
-        container: document.querySelector('.auth-container'),
-        loginForm: document.querySelector('.login-form'),
-        signupForm: document.querySelector('.signup-form'),
-        loginBtn: document.querySelector('.login-btn'),
-        signupBtn: document.querySelector('.signup-btn'),
-        loginMsg: document.querySelector('.login-message'),
-        signupMsg: document.querySelector('.signup-message'),
-        checkToggle: document.getElementById('check')
-      };
-      
-      Object.entries(elements).forEach(([name, element]) => {
-        if (element) {
-          console.log(`✅ ${name}: Found`);
-        } else {
-          console.error(`❌ ${name}: Not found`);
+      .auth-switch {
+        font-size: 16px;
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #6c757d;
+      }
+
+      .auth-switch label {
+        color: #009579;
+        cursor: pointer;
+        font-weight: 500;
+        text-decoration: none;
+      }
+
+      .auth-switch label:hover {
+        text-decoration: underline;
+      }
+
+      /* Message styles */
+      .message {
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        display: none;
+        animation: slideIn 0.3s ease;
+      }
+
+      .message.success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .message.error {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .message.info {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
         }
-      });
-      
-      // Test CSS
-      const container = elements.container;
-      if (container) {
-        const containerStyle = window.getComputedStyle(container);
-        console.log('🎨 CSS Status:', {
-          background: containerStyle.backgroundColor,
-          maxWidth: containerStyle.maxWidth,
-          borderRadius: containerStyle.borderRadius
-        });
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      
-      // Test form switching
-      if (elements.checkToggle) {
-        elements.checkToggle.addEventListener('change', function() {
-          const loginVisible = document.querySelector('.login-form').style.display !== 'none';
-          const signupVisible = document.querySelector('.registration').style.display !== 'none';
-          console.log('🔄 Form toggle test:', {
-            loginVisible,
-            signupVisible,
-            checked: this.checked
+
+      /* Loading state */
+      .btn-auth.loading {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .btn-auth.loading::after {
+        content: "";
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive design */
+      @media (max-width: 480px) {
+        .auth-container {
+          width: 95%;
+          margin: 20px;
+        }
+
+        .auth-form {
+          padding: 2rem 1.5rem;
+        }
+
+        .form-header {
+          font-size: 1.7rem;
+        }
+
+        .form-input,
+        .btn-auth {
+          height: 50px;
+        }
+      }
+
+      /* Logo section */
+      .auth-logo {
+        text-align: center;
+        padding: 2rem 2.5rem 0;
+      }
+
+      .logo-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #009579 0%, #20c997 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+      }
+
+      .logo-icon img {
+        width: 70px;
+        height: 70px;
+        border-radius: 6px;
+      }
+
+      .logo-text h1 {
+        font-size: 1.5rem;
+        color: #333;
+        margin: 0;
+        font-weight: 600;
+      }
+
+      .logo-text p {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin: 0.25rem 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <input type="checkbox" id="check" />
+
+      <div class="auth-logo">
+        <div class="logo-icon">
+          <img
+            src="../assets/F2C_LOGO.svg"
+            alt="F2C Logo"
+            width="70"
+            height="70"
+          />
+        </div>
+        <div class="logo-text">
+          <h1>F2C Solutions</h1>
+          <p>Farmer to Customer</p>
+        </div>
+      </div>
+
+      <div class="login auth-form">
+        <header class="form-header">Welcome Back</header>
+        <form class="login-form" id="loginForm">
+          <div class="message login-message" aria-live="polite"></div>
+
+          <div class="form-group">
+            <input
+              type="text"
+              name="email"
+              class="form-input"
+              placeholder="Enter your email"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <input
+              type="password"
+              name="password"
+              class="form-input"
+              placeholder="Enter your password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+
+          <a href="#" class="forgot-password">Forgot password?</a>
+
+          <button type="button" class="btn-auth login-btn" id="loginButton">
+            Login
+          </button>
+
+          <div class="auth-switch">
+            Don't have an account?
+            <label for="check">Sign Up</label>
+          </div>
+        </form>
+      </div>
+
+      <div class="registration auth-form">
+        <header class="form-header">Create Account</header>
+        <form class="signup-form" id="signupForm">
+          <div class="message signup-message" aria-live="polite"></div>
+
+          <div class="form-group">
+            <input
+              type="text"
+              name="email"
+              class="form-input"
+              placeholder="Enter your email"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <input
+              type="text"
+              name="username"
+              class="form-input"
+              placeholder="Choose a username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <input
+              type="password"
+              name="password"
+              class="form-input"
+              placeholder="Create a password"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <input
+              type="password"
+              name="confirm"
+              class="form-input"
+              placeholder="Confirm your password"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+
+          <button type="button" class="btn-auth signup-btn" id="signupButton">
+            Create Account
+          </button>
+
+          <div class="auth-switch">
+            Already have an account?
+            <label for="check">Login</label>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+      // Enhanced debugging and error handling
+      console.log("Auth page loaded successfully");
+
+      // Test if elements are found and event listeners work
+      function debugAuthPage() {
+        console.log("🔍 Debug: Checking auth page elements...");
+
+        const elements = {
+          container: document.querySelector(".auth-container"),
+          loginForm: document.querySelector(".login-form"),
+          signupForm: document.querySelector(".signup-form"),
+          loginBtn: document.querySelector(".login-btn"),
+          signupBtn: document.querySelector(".signup-btn"),
+          loginMsg: document.querySelector(".login-message"),
+          signupMsg: document.querySelector(".signup-message"),
+          checkToggle: document.getElementById("check"),
+        };
+
+        Object.entries(elements).forEach(([name, element]) => {
+          if (element) {
+            console.log(`✅ ${name}: Found`);
+          } else {
+            console.error(`❌ ${name}: Not found`);
+          }
+        });
+
+        // Test CSS
+        const container = elements.container;
+        if (container) {
+          const containerStyle = window.getComputedStyle(container);
+          console.log("🎨 CSS Status:", {
+            background: containerStyle.backgroundColor,
+            maxWidth: containerStyle.maxWidth,
+            borderRadius: containerStyle.borderRadius,
           });
-        });
-        console.log('✅ Form toggle listener added');
-      }
-    }
-    
-    // Run debug after DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', debugAuthPage);
-    } else {
-      debugAuthPage();
-    }
-    
-    // Test JavaScript loading
-    console.log('📜 Script status:', {
-      authJS: typeof window.authDebug !== 'undefined' ? 'Loaded' : 'Not loaded',
-      readyState: document.readyState
-    });
-    
-    // Additional initialization
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 DOM ready - auth system should be initialized');
-      
-      // Test button functionality after a short delay
-      setTimeout(() => {
-        const loginBtn = document.querySelector('.login-btn');
-        const signupBtn = document.querySelector('.signup-btn');
-        
-        if (loginBtn) {
-          loginBtn.addEventListener('click', () => console.log('🖱️ Login button clicked directly'));
         }
-        
-        if (signupBtn) {
-          signupBtn.addEventListener('click', () => console.log('🖱️ Signup button clicked directly'));
-        }
-        
-        console.log('✅ Direct button listeners added for testing');
-      }, 500);
-    });
 
-    // Test CSS loading with external stylesheet (fallback)
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '../styles/auth.css';
-    link.onload = () => console.log('✅ External auth.css loaded successfully');
-    link.onerror = () => console.warn('⚠️ External auth.css failed to load (using inline styles instead)');
-    document.head.appendChild(link);
-  </script>
-</body>
+        // Test form switching
+        if (elements.checkToggle) {
+          elements.checkToggle.addEventListener("change", function () {
+            const loginVisible =
+              document.querySelector(".login-form").style.display !== "none";
+            const signupVisible =
+              document.querySelector(".registration").style.display !== "none";
+            console.log("🔄 Form toggle test:", {
+              loginVisible,
+              signupVisible,
+              checked: this.checked,
+            });
+          });
+          console.log("✅ Form toggle listener added");
+        }
+      }
+
+      // Run debug after DOM is ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", debugAuthPage);
+      } else {
+        debugAuthPage();
+      }
+
+      // Test JavaScript loading
+      console.log("📜 Script status:", {
+        authJS:
+          typeof window.authDebug !== "undefined" ? "Loaded" : "Not loaded",
+        readyState: document.readyState,
+      });
+
+      // Additional initialization
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("🚀 DOM ready - auth system should be initialized");
+
+        // Test button functionality after a short delay
+        setTimeout(() => {
+          const loginBtn = document.querySelector(".login-btn");
+          const signupBtn = document.querySelector(".signup-btn");
+
+          if (loginBtn) {
+            loginBtn.addEventListener("click", () =>
+              console.log("🖱️ Login button clicked directly")
+            );
+          }
+
+          if (signupBtn) {
+            signupBtn.addEventListener("click", () =>
+              console.log("🖱️ Signup button clicked directly")
+            );
+          }
+
+          console.log("✅ Direct button listeners added for testing");
+        }, 500);
+      });
+
+      // Test CSS loading with external stylesheet (fallback)
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "../styles/auth.css";
+      link.onload = () =>
+        console.log("✅ External auth.css loaded successfully");
+      link.onerror = () =>
+        console.warn(
+          "⚠️ External auth.css failed to load (using inline styles instead)"
+        );
+      document.head.appendChild(link);
+    </script>
+  </body>
 </html>
